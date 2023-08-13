@@ -3,7 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	 "real-time-forum/db"
+	"real-time-forum/db"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -31,7 +31,7 @@ func handleRegistration(w http.ResponseWriter, r *http.Request) {
     }
 
     // Insert user data into the database
-    _, err = db.Exec("INSERT INTO Users (email, username, password, firstName, lastName, gender) VALUES (?, ?, ?, ?, ?, ?)",
+    _, err = db.Dbase.Exec("INSERT INTO Users (email, username, password, firstName, lastName, gender) VALUES (?, ?, ?, ?, ?, ?)",
         email, username, hashedPassword, firstName, lastName, gender)
     if err != nil {
         // Handle error

@@ -1,4 +1,4 @@
-module main.go
+module real-time-forum
 
 go 1.21.0
 

@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
-	"golang.org/x/crypto/bcrypt"
 	"real-time-forum/db"
+	"real-time-forum/server"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -16,19 +18,19 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
     // Retrieve user by email or nickname
     emailOrNickname := r.FormValue("email_or_nickname")
-    user, err := getUserByEmailOrNickname(Dbase, emailOrNickname)
+    user, err := getUserByEmailOrNickname(db.Dbase, emailOrNickname)
     if err != nil {
         // Handle error
         return
     }
 
-    if user.ID == 0 {
+    if user.userID == 0 {
         // User not found
         // Handle invalid credentials
         return
     }
     // Compare hashed password with provided password
-    err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(r.FormValue("password")))
+    err = bcrypt.CompareHashAndPassword([]byte(user.password), []byte(r.FormValue("password")))
     if err != nil {
         // Handle invalid credentials
         return
@@ -40,20 +42,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
     // Redirect to the user's dashboard or send a response
 }
 
-func getUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (User, error) {
-    query := "SELECT * FROM Users WHERE email = ? OR nickname = ? LIMIT 1"
+func getUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (server.User, error) {
+    query := "SELECT * FROM Users WHERE email = ? OR username = ? LIMIT 1"
 
-    var user User
+    var user server.User
     err := db.QueryRow(query, emailOrNickname, emailOrNickname).Scan(
-        &user.ID, &user.Nickname, &user.Age, &user.Gender,
-        &user.FirstName, &user.LastName, &user.Email, &user.HashedPassword,
+        &user.userID, &user.email, &user.username, &user.password,
+        &user.FirstName, &user.LastName, &user.gender,
     )
     if err != nil {
         if err == sql.ErrNoRows {
             // User not found
-            return User{}, nil
+            return server.User{}, nil
         }
-        return User{}, err
+        return server.User{}, err
     }
 
     return user, nil
