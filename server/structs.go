@@ -1,11 +1,11 @@
 package server
 
 type User struct {
-	userID 		int
-	email 		string
-	username 	string
-	password 	string
-	firstName 	string
-	lastName 	string
-	gender 		string
+	UserID 		int
+	Email 		string
+	Username 	string
+	Password 	string
+	FirstName 	string
+	LastName 	string
+	Gender 		string
 }

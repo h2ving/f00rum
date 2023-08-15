@@ -24,13 +24,13 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if user.userID == 0 {
+    if user.UserID == 0 {
         // User not found
         // Handle invalid credentials
         return
     }
     // Compare hashed password with provided password
-    err = bcrypt.CompareHashAndPassword([]byte(user.password), []byte(r.FormValue("password")))
+    err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(r.FormValue("password")))
     if err != nil {
         // Handle invalid credentials
         return
@@ -47,8 +47,8 @@ func getUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (server.User, 
 
     var user server.User
     err := db.QueryRow(query, emailOrNickname, emailOrNickname).Scan(
-        &user.userID, &user.email, &user.username, &user.password,
-        &user.FirstName, &user.LastName, &user.gender,
+        &user.UserID, &user.Email, &user.Username, &user.Password,
+        &user.FirstName, &user.LastName, &user.Gender,
     )
     if err != nil {
         if err == sql.ErrNoRows {
