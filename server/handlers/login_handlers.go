@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
+	"real-time-forum/cmd"
 	"real-time-forum/db"
 	"real-time-forum/server"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -37,7 +40,18 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
     }
 
     // Set up a session (e.g., using cookies or JWT) upon successful login
-    // ...
+    
+    // Generate a session token
+    sessionToken := generateSessionToken()
+    // Store the session token and user ID in the sessions map
+    cmd.Sessions[sessionToken] = user.UserID
+    // Set a cookie with the session token
+    http.SetCookie(w, &http.Cookie{
+        Name:     "session-token",
+        Value:    sessionToken,
+        HttpOnly: true,
+        MaxAge:   60 * 15, // 15 minutes
+    })
 
     // Redirect to the user's dashboard or send a response
 }
@@ -60,3 +74,24 @@ func getUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (server.User, 
 
     return user, nil
 }
+
+func generateSessionToken() string {
+    /* // COMPLETELY RANDOMIZED
+    // generate a unique session token using UUID
+    sessionUUID, err := uuid.NewV4()
+    if err != nil {
+        log.Fatalf("Error generating session token: %v", err)
+    }
+    log.Printf("Generated V4 UUID: %v", sessionUUID)
+    */
+
+    // Parse a UUID from secretkey
+    u3, err := uuid.FromBytes(cmd.SecretKey)
+    if err != nil {
+        log.Fatalf("Failed to parse UUID %q: %v", cmd.SecretKey, err)
+    }
+    log.Printf("successfully parsed UUID %v", u3)
+    // return the token
+    return u3.String()
+}
+
