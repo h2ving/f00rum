@@ -9,8 +9,3 @@ type User struct {
 	LastName 	string
 	Gender 		string
 }
-
-// var Session struct{
-// 	Sessions map[string]int
-// 	SecretKey []byte
-// }

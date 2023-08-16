@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"real-time-forum/cmd"
 	"real-time-forum/db"
 	"real-time-forum/server"
+
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,7 +17,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
     // Parse form data
     err := r.ParseForm()
     if err != nil {
-        // Handle error
+        log.Fatalf("Error parsing form data: %v", err)
         return
     }
 
@@ -24,6 +26,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
     user, err := getUserByEmailOrNickname(db.Dbase, emailOrNickname)
     if err != nil {
         // Handle error
+        fmt.Printf("Error getting user by email or nickname: %v <> error: %v \n", emailOrNickname, err)
         return
     }
 
