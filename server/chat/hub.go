@@ -1,6 +1,6 @@
 package chat
 
-func newHub() *Hub {
+func NewHub() *Hub {
 	return &Hub{
 		Broadcast: make(chan []byte),
 		Register: make(chan *Client),
@@ -9,7 +9,7 @@ func newHub() *Hub {
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.Register:
