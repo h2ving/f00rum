@@ -1,11 +1,22 @@
 package server
 
 type User struct {
-	UserID 		int
-	Email 		string
-	Username 	string
-	Password 	string
-	FirstName 	string
-	LastName 	string
-	Gender 		string
+	UserID    int
+	Username  string
+	Password  string
+	Email     string
+	FirstName string
+	LastName  string
+	Age       int
+	Gender    string
+}
+
+type RegistrationData struct {
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Age       string `json:"age"`
+	Gender    string `json:"gender"`
 }

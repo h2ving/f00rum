@@ -1,42 +1,72 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"real-time-forum/db"
-	"golang.org/x/crypto/bcrypt"
+	"real-time-forum/server"
+	"real-time-forum/server/functions"
+	"strconv"
 )
 
-func handleRegistration(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+	var regData server.RegistrationData
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&regData)
 	if err != nil {
-		// TODO: handle error
-		fmt.Println("Error parsing registration form: ", err)
+		http.Error(w, "Error parsing JSON: "+err.Error(), http.StatusBadRequest)
+
 		return
 	}
 
-	// Extract form values
-    email := r.FormValue("email")
-	username := r.FormValue("username")
-	firstName := r.FormValue("firstName")
-	lastName := r.FormValue("lastName")
-	gender := r.FormValue("gender")
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(regData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Error hashing password", http.StatusInternalServerError)
+		return
+	}
+	ageInt, _ := strconv.Atoi(regData.Age)
+	// Insert user data into the database
+	_, err = db.Dbase.Exec("INSERT INTO Users (email, username, password, firstName, lastName, age, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		regData.Email, regData.Username, hashedPassword, regData.FirstName, regData.LastName, ageInt, regData.Gender)
+	if err != nil {
+		http.Error(w, "Error registering user"+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    // Hash the password
-    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
-    if err != nil {
-        // Handle error
-		fmt.Println("Error ")
-        return
-    }
+	user, err := functions.GetUserByEmailOrNickname(db.Dbase, regData.Username)
+	if err != nil {
+		// Handle error
+		fmt.Printf("Error getting user by email or nickname: %v <> error: %v \n", regData.Username, err)
+		return
+	}
 
-    // Insert user data into the database
-    _, err = db.Dbase.Exec("INSERT INTO Users (email, username, password, firstName, lastName, gender) VALUES (?, ?, ?, ?, ?, ?)",
-        email, username, hashedPassword, firstName, lastName, gender)
-    if err != nil {
-        // Handle error
-        return
-    }
+	if user.UserID == 0 {
+		// User not found
+		// Handle invalid credentials
+		return
+	}
 
-	// Redirect to a success page or send a response
+	// Generate a session token
+	sessionToken := functions.GenerateSessionToken()
+
+	// Store the session in the database with an expiration time
+	functions.StoreSessionInDB(db.Dbase, sessionToken, user.UserID)
+
+	// Set a cookie with the session token
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session-token",
+		Value:    sessionToken,
+		HttpOnly: true,
+		MaxAge:   60 * 15, // 15 minutes
+	})
+
+	// Send a success response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Registration successful",
+	})
 }

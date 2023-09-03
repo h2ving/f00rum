@@ -11,7 +11,7 @@ import (
 var Dbase *sql.DB
 
 func StartDB() {
-	db, err := sql.Open("sqlite3", "./database.db")
+	db, err := sql.Open("sqlite3", "./db/database.db")
 	if err != nil {
 		log.Fatal(err)
 	}
