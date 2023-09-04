@@ -14,7 +14,7 @@ type AuthResponse struct {
 }
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/" && r.URL.Path != "/forum" {
 		http.Error(w, "ErrorIndex3", http.StatusInternalServerError)
 		return
 	}

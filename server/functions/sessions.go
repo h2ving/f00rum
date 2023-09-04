@@ -14,7 +14,7 @@ func GetUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (server.User, 
 
 	var user server.User
 	err := db.QueryRow(query, emailOrNickname, emailOrNickname).Scan(
-		&user.UserID, &user.Email, &user.Username, &user.Password,
+		&user.UserID, &user.Username, &user.Password, &user.Email,
 		&user.FirstName, &user.LastName, &user.Age, &user.Gender,
 	)
 	if err != nil {
@@ -41,9 +41,12 @@ func StoreSessionInDB(db *sql.DB, sessionToken string, userID int) {
 	// Set the session expiration time
 	expiresAt := time.Now().Add(15 * time.Minute)
 
-	// Insert the session into the database
-	_, err := db.Exec("INSERT INTO Sessions (sessionID, userID, expiresAt) VALUES (?, ?, ?)", sessionToken, userID, expiresAt)
+	// Insert or replace the session in the database
+	_, err := db.Exec(`
+		INSERT OR REPLACE INTO Sessions (sessionID, userID, expiresAt) 
+		VALUES (?, ?, ?)`,
+		sessionToken, userID, expiresAt)
 	if err != nil {
-		log.Fatalf("Error storing session in database: %v", err)
+		log.Fatalf("Error storing or updating session in database: %v", err)
 	}
 }
