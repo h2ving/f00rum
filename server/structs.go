@@ -20,3 +20,8 @@ type RegistrationData struct {
 	Age       string `json:"age"`
 	Gender    string `json:"gender"`
 }
+
+type LoginData struct {
+	Username string `json:"user"`
+	Password string `json:"password"`
+}

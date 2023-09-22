@@ -48,10 +48,10 @@ CREATE TABLE IF NOT EXISTS 'PrivateMessages' (
 );
 
 CREATE TABLE IF NOT EXISTS `Sessions` (
-                                          `sessionID` TEXT PRIMARY KEY,
-                                          `userID` INTEGER UNIQUE NOT NULL,
-                                          `expiresAt` TIMESTAMP,
-                                          FOREIGN KEY(userID) REFERENCES Users(userID) ON DELETE CASCADE
+    `sessionID` TEXT PRIMARY KEY,
+    `userID` INTEGER UNIQUE NOT NULL,
+    `expiresAt` TIMESTAMP,
+    FOREIGN KEY(userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
 
 
