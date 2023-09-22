@@ -1,6 +1,97 @@
-const content = document.getElementById('content')
+// Event listeners
+document.body.addEventListener('submit', async function(event) {
+    if (event.target.id === 'registrationForm') {
+        event.preventDefault(); // Prevent default form submission
+        // Collect data from the form
+        const formData = new FormData(event.target);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        try {
+            // Send data to the server
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
 
+            const result = await response.json();
 
+            // Handle server's response
+            if (response.ok) {
+                alert(result.message); // Show success message
+                // You can redirect the user to the forum page
+                history.pushState({ page: 'forum' }, 'Forum', '/forum');
+
+            } else {
+                alert(result.error); // Show error message
+            }
+        } catch (error) {
+            console.error('There was an error:', error);
+            alert('Registration failed. Please try again.');
+        }
+
+    } else if (event.target.id === 'loginForm') {
+        event.preventDefault(); // Prevent default form submission
+        // Collect data from the form
+        const formData = new FormData(event.target);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        try {
+            // Send data to the server
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            // Handle server's response
+            if (response.ok) {
+                alert(result.message); // Show success message
+                // You can redirect the user to the forum page
+                history.pushState({ page: 'forum' }, 'Forum', '/forum');
+            } else {
+                alert(result.error); // Show error message
+            }
+        } catch (error) {
+            console.error('There was an error:', error);
+            alert('Login failed. Please try again.');
+        }
+    }});
+// Event listeners
+    window.addEventListener('popstate', function(event) {
+        if (event.state) {
+            router(event.state);
+        }
+    });
+document.body.addEventListener('click', function(event) {
+    if (event.target.id === 'buttonHome') {
+        event.preventDefault(); // Prevent the default behavior of the anchor tag
+        checkAuthentication(); // Assuming checkAuthentication is a function
+
+    } else if (event.target.id === 'logout') {
+        // Delete the session-token cookie
+        document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        // Redirect the user to the login page
+        history.pushState({ page: 'login' }, 'Login', '/login');
+    }
+});
+window.addEventListener('popstate', function(event) {
+    if (event.state) {
+        router(event.state);
+    }
+});
 
 // Load the forum content
 function loadForumContent() {
@@ -13,25 +104,7 @@ function loadForumContent() {
     header.innerHTML = loggedIn;
     container.innerHTML = '<h1>Welcome to the Forum</h1>'; // Add more forum content as needed
 
-    // Add event listener to the logout button
-    document.getElementById('logout').addEventListener('click', function() {
-        // Delete the session-token cookie
-        document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-        // Redirect the user to the login page
-        history.pushState({ page: 'login' }, 'Login', '/login');
-    });
-
-    // Add event listener to the button-home
-    document.getElementById('buttonHome').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default behavior of the anchor tag
-        checkAuthentication;
-    });
-    window.addEventListener('popstate', function(event) {
-        if (event.state) {
-            router(event.state);
-        }
-    });
 }
 
 // Load the login page with a registration option
@@ -69,81 +142,7 @@ function loadLoginPage() {
     `;
     header.innerHTML = login;
     container.innerHTML = register;
-    document.getElementById('registrationForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); // Prevent default form submission
 
-        // Collect data from the form
-        const formData = new FormData(event.target);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-        try {
-            // Send data to the server
-            const response = await fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            // Handle server's response
-            if (response.ok) {
-                alert(result.message); // Show success message
-                // You can redirect the user to the forum page
-                history.pushState({ page: 'forum' }, 'Forum', '/forum');
-
-            } else {
-                alert(result.error); // Show error message
-            }
-        } catch (error) {
-            console.error('There was an error:', error);
-            alert('Registration failed. Please try again.');
-        }
-    });
-
-    document.getElementById('loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); // Prevent default form submission
-        // Collect data from the form
-        const formData = new FormData(event.target);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
-        try {
-            // Send data to the server
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            // Handle server's response
-            if (response.ok) {
-                alert(result.message); // Show success message
-                // You can redirect the user to the forum page
-                history.pushState({ page: 'forum' }, 'Forum', '/forum');
-            } else {
-                alert(result.error); // Show error message
-            }
-        } catch (error) {
-            console.error('There was an error:', error);
-            alert('Login failed. Please try again.');
-        }
-    });
-    window.addEventListener('popstate', function(event) {
-        if (event.state) {
-            router(event.state);
-        }
-    });
 }
 
 function loadChatBox() {
@@ -229,6 +228,18 @@ async function checkAuthentication() {
         // Handle the error, maybe show a message to the user or reload the login page
     }
 }
-
-
+window.onload = function() {
+    const currentPath = window.location.pathname;
+    switch (currentPath) {
+        case '/forum':
+            loadForumContent();
+            break;
+        case '/login':
+            loadLoginPage();
+            break;
+        default:
+            // Handle 404 or redirect to a default page
+            break;
+    }
+}
 window.onload = checkAuthentication;

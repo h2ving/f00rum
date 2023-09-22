@@ -102,7 +102,7 @@ header {
     border-color: #909090; /* Secondary Text color for dropdown border */
     appearance: none; /* Removes default browser styling */
     background-color: #eaeaea; /* Light background for dropdown */
-    cursor: pointer; /* Hand cursor for dropdown */
+    cursor: crosshair; /* Hand cursor for dropdown */
 }
 
 #registrationForm select:focus {

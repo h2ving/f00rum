@@ -25,13 +25,16 @@ func main() {
 	}
 
 	hub := chat.NewHub()
-	mux.HandleFunc("/", handlers.HandleIndex)
-	mux.HandleFunc("/forum", handlers.HandleIndex)
+	// mux.HandleFunc("/", handlers.HandleIndex)
 	mux.HandleFunc("/register", handlers.HandleRegistration).Methods("POST")
 	mux.HandleFunc("/check-auth", handlers.CheckAuth)
 	mux.HandleFunc("/login", handlers.HandleLogin).Methods("POST")
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		chat.ServeWs(hub, w, r)
+	})
+	// Catch-all route to serve index.html for all other routes
+	mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/static/index.html")
 	})
 	http.Handle("/", mux)
 	go hub.Run()
