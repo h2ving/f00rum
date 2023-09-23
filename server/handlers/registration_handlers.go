@@ -58,10 +58,9 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 
 	// Set a cookie with the session token
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session-token",
-		Value:    sessionToken,
-		HttpOnly: true,
-		MaxAge:   60 * 15, // 15 minutes
+		Name:   "session-token",
+		Value:  sessionToken,
+		MaxAge: 60 * 15, // 15 minutes
 	})
 
 	// Send a success response

@@ -25,10 +25,10 @@ func main() {
 	}
 
 	hub := chat.NewHub()
-	// mux.HandleFunc("/", handlers.HandleIndex)
 	mux.HandleFunc("/register", handlers.HandleRegistration).Methods("POST")
 	mux.HandleFunc("/check-auth", handlers.CheckAuth)
 	mux.HandleFunc("/login", handlers.HandleLogin).Methods("POST")
+	mux.HandleFunc("/logout", handlers.HandleLogout).Methods("POST")
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		chat.ServeWs(hub, w, r)
 	})

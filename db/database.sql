@@ -37,11 +37,11 @@ CREATE TABLE IF NOT EXISTS `Comments` (
 	FOREIGN KEY (postID) REFERENCES Posts(postID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS 'PrivateMessages' (
+CREATE TABLE IF NOT EXISTS 'ChatMessages' (
     'messageID' INTEGER PRIMARY KEY AUTOINCREMENT,
     'senderID' INTEGER NOT NULL,
     'receiverID' INTEGER NOT NULL,
-    'content' TEXT NOT NULL,
+    'message' TEXT NOT NULL,
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (senderID) REFERENCES Users(userID),
     FOREIGN KEY (receiverID) REFERENCES Users(userID)
@@ -53,5 +53,6 @@ CREATE TABLE IF NOT EXISTS `Sessions` (
     `expiresAt` TIMESTAMP,
     FOREIGN KEY(userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
+
 
 

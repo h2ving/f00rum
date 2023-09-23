@@ -25,7 +25,7 @@ document.body.addEventListener('submit', async function(event) {
                 alert(result.message); // Show success message
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
-
+                render();
             } else {
                 alert(result.error); // Show error message
             }
@@ -57,9 +57,9 @@ document.body.addEventListener('submit', async function(event) {
 
             // Handle server's response
             if (response.ok) {
-                alert(result.message); // Show success message
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
+                router(history.state);
             } else {
                 alert(result.error); // Show error message
             }
@@ -68,23 +68,34 @@ document.body.addEventListener('submit', async function(event) {
             alert('Login failed. Please try again.');
         }
     }});
-// Event listeners
-    window.addEventListener('popstate', function(event) {
-        if (event.state) {
-            router(event.state);
-        }
-    });
-document.body.addEventListener('click', function(event) {
+document.body.addEventListener('click', async function(event) {
     if (event.target.id === 'buttonHome') {
         event.preventDefault(); // Prevent the default behavior of the anchor tag
-        checkAuthentication(); // Assuming checkAuthentication is a function
+        await checkAuthentication(); // Assuming checkAuthentication is a function
 
     } else if (event.target.id === 'logout') {
+        try {
+            // Send data to the server
+            const response = await fetch('/logout', {
+                method: 'POST',
+            });
+
+            const result = await response.json();
+
+            // Handle server's response
+            if (response.ok) {
+                // Redirect the user to the login page
+                history.pushState({ page: 'login' }, 'Login', '/login');
+                router(history.state);
+            } else {
+                alert(result.error); // Show error message
+            }
+        } catch (error) {
+            console.error('There was an error:', error);
+            alert('Login failed. Please try again.');
+        }
         // Delete the session-token cookie
         document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-        // Redirect the user to the login page
-        history.pushState({ page: 'login' }, 'Login', '/login');
     }
 });
 window.addEventListener('popstate', function(event) {
@@ -96,15 +107,12 @@ window.addEventListener('popstate', function(event) {
 // Load the forum content
 function loadForumContent() {
     const header = document.querySelector('header');
-    const container = document.querySelector('.container');
     const loggedIn = `
             <a href="#" id="buttonHome" class="button-home">Real-Time Forum</a>
             <button id="logout" type="button">Log out</button>
     `;
     header.innerHTML = loggedIn;
-    container.innerHTML = '<h1>Welcome to the Forum</h1>'; // Add more forum content as needed
-
-
+    loadChatBox()
 }
 
 // Load the login page with a registration option
@@ -145,6 +153,8 @@ function loadLoginPage() {
 
 }
 
+let socket = new WebSocket("ws://localhost:8080/ws");
+
 function loadChatBox() {
     const container = document.querySelector('.container');
     const chatBox = `
@@ -184,16 +194,19 @@ function sendMessage() {
     const message = input.value;
     if (message.trim() === '') return; // Don't send empty messages
 
-    const chatMessagesDiv = document.querySelector('.chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
-    chatMessagesDiv.appendChild(messageDiv);
+    // Send the message to the server over WebSockets
+    socket.send(message);
 
     input.value = ''; // Clear the input
-
-    // TODO: Send the message to the server or other users
 }
 
+// Listen for incoming messages
+socket.onmessage = function(event) {
+    const chatMessagesDiv = document.querySelector('.chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = event.data;
+    chatMessagesDiv.appendChild(messageDiv);
+};
 
 function router(state) {
     switch (state.page) {
@@ -228,7 +241,7 @@ async function checkAuthentication() {
         // Handle the error, maybe show a message to the user or reload the login page
     }
 }
-window.onload = function() {
+function render() {
     const currentPath = window.location.pathname;
     switch (currentPath) {
         case '/forum':

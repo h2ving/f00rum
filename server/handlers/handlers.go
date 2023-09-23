@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"html/template"
 	"net/http"
 	"real-time-forum/db"
 	"time"
@@ -11,24 +10,6 @@ import (
 
 type AuthResponse struct {
 	IsAuthenticated bool `json:"isAuthenticated"`
-}
-
-func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" && r.URL.Path != "/forum" {
-		http.Error(w, "ErrorIndex3", http.StatusInternalServerError)
-		return
-	}
-	tmpl, err := template.ParseFiles("./web/static/index.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error1", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error2", http.StatusInternalServerError)
-	}
-
 }
 
 func CheckAuth(w http.ResponseWriter, r *http.Request) {

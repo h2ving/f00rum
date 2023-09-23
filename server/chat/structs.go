@@ -7,7 +7,9 @@ type Client struct {
 	// Websocket connection
 	Conn *websocket.Conn
 	// Buffered channel for outbound messages
-	Send chan []byte
+	Send     chan []byte
+	ID       int
+	Username string
 }
 
 type Hub struct {
