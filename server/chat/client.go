@@ -40,6 +40,7 @@ var upgrader = websocket.Upgrader{
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
 func (c *Client) readPump() {
+	fmt.Println("hi")
 	defer func() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
@@ -49,6 +50,7 @@ func (c *Client) readPump() {
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		_, message, err := c.Conn.ReadMessage()
+
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("Error : %v", err)
@@ -89,6 +91,7 @@ func (c *Client) readPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
+	fmt.Println("ERR2")
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -131,16 +134,18 @@ func (c *Client) writePump() {
 
 // ServeWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("hi")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)}
+	fmt.Println(client)
 	hub.Register <- client
-
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
+	fmt.Println("Starting  goroutines")
 	go client.writePump()
 	go client.readPump()
 }
