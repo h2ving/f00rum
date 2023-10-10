@@ -1,12 +1,13 @@
 package chat
 
 import (
-	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"real-time-forum/server"
 	"time"
-
-	"github.com/gorilla/websocket"
 )
 
 const (
@@ -25,11 +26,11 @@ const (
 
 var (
 	newline = []byte{'\n'}
-	space = []byte{' '}
+	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader {
-	ReadBufferSize: 1024,
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
@@ -54,8 +55,31 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.Hub.Broadcast <- message
+		// Assuming your messages are in JSON format
+		var messageData map[string]interface{}
+		if err := json.Unmarshal(message, &messageData); err != nil {
+			log.Printf("Error parsing JSON: %v", err)
+			continue
+		}
+
+		// Check the action field in the message
+		action, ok := messageData["action"].(string)
+		if !ok {
+			log.Printf("Invalid message format: %v", messageData)
+			continue
+		}
+		fmt.Println(action)
+
+		// Handle different actions here
+		switch action {
+		case "fetch_users":
+			// Handle the fetch_users action here
+			fmt.Println("HERE1")
+			fetchAndSendUsers(c.Conn)
+		default:
+			// Handle other actions as needed
+		}
+
 	}
 }
 
@@ -105,7 +129,7 @@ func (c *Client) writePump() {
 	}
 }
 
-// serveWs handles websocket requests from the peer.
+// ServeWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -113,10 +137,29 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)}
-	client.Hub.Register <- client
+	hub.Register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
+}
+
+func FindClientBySenderID(h *Hub, senderID int) *Client {
+	for client, id := range h.Clients {
+		if id == senderID {
+			return client
+		}
+	}
+	return nil // Return nil if no client is found with the given senderID
+}
+
+func HandleNewUserWsAlert(newUser server.User, h *Hub) {
+	message := map[string]interface{}{
+		"type": "newUser",
+		"data": newUser,
+	}
+	jsonData, _ := json.Marshal(message)
+	// Broadcast the message to all connected clients
+	h.Broadcast <- jsonData
 }

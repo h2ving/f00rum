@@ -20,9 +20,9 @@ func StartDB() {
 		log.Fatal("Cannot ping db!")
 	}
 
-	_, error := db.Exec(ReadTable("database.sql"))
-	if error != nil {
-		log.Fatal(error)
+	_, err1 := db.Exec(ReadTable("database.sql"))
+	if err1 != nil {
+		log.Fatal(err1)
 	}
 
 	Dbase = db

@@ -103,6 +103,9 @@ window.addEventListener('popstate', function(event) {
         router(event.state);
     }
 });
+window.addEventListener("beforeunload", () => {
+    socket.close();
+});
 
 // Load the forum content
 function loadForumContent() {
@@ -155,9 +158,10 @@ function loadLoginPage() {
 
 let socket = new WebSocket("ws://localhost:8080/ws");
 
+
 function loadChatBox() {
     const container = document.querySelector('.container');
-    const chatBox = `
+    container.innerHTML = `
             <div id="chatBox" class="chat-box">
         <div class="chat-users">
             <!-- Dynamically populated list of users will appear here -->
@@ -171,31 +175,69 @@ function loadChatBox() {
         </div>
     </div>
     `;
-    container.innerHTML = chatBox;
 
     // Sample user list. Replace with your actual user data.
-    const users = ["Alice", "Bob", "Charlie", "David"];
+    //const users = ["Alice", "Bob", "Charlie", "David"];
+
 
 // Populate the user list dynamically
-    const userListDiv = document.querySelector('.chat-users');
-    users.forEach(user => {
-        const userDiv = document.createElement('div');
-        userDiv.textContent = user;
-        userDiv.onclick = function() {
-            // Handle user click, e.g., start a chat with this user
+    fetchUsers(function(users) {
+        console.log(users);
+
+        // Populate the user list dynamically
+        const userListDiv = document.querySelector('.chat-users');
+        users.forEach(user => {
+            const userDiv = document.createElement('div');
+            userDiv.textContent = user;
+            userDiv.onclick = function() {
+                // Remove highlight from all users
+                document.querySelectorAll('.chat-users div').forEach(div => {
+                    div.classList.remove('selected');
+                });
+                // Highlight the clicked user
+                this.classList.add('selected');
+            };
+            userListDiv.appendChild(userDiv);
+        });
+    });
+}
+
+// Function to fetch users from the server via WebSocket
+function fetchUsers(callback) {
+
+        // Send a message to request the user list
+        const requestData = {
+            action: "fetch_users"
         };
-        userListDiv.appendChild(userDiv);
+        socket.send(JSON.stringify(requestData));
+
+
+
+    // Listen for incoming WebSocket messages
+    socket.addEventListener("message", (event) => {
+        const message = JSON.parse(event.data);
+
+        // Check if it's an update_users message
+        if (message.action === "update_users") {
+            const userList = message.data;
+            console.log("hi");
+            console.log(userList);
+            // Call a function to update the user list in the UI
+            callback(userList);
+        }
     });
 }
 
 // Function to send a message
-function sendMessage() {
+function sendMessage(userID) {
     const input = document.getElementById('chatInput');
     const message = input.value;
     if (message.trim() === '') return; // Don't send empty messages
-
-    // Send the message to the server over WebSockets
-    socket.send(message);
+    let jsonData = {}
+    jsonData["action"] = "send_message"
+    jsonData["to"] = parseInt(userID)
+    jsonData["message"] = message
+    socket.send(JSON.stringify(jsonData))
 
     input.value = ''; // Clear the input
 }

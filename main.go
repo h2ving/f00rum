@@ -9,11 +9,6 @@ import (
 	"real-time-forum/server/handlers"
 )
 
-var (
-	Sessions  = make(map[string]int)
-	SecretKey = []byte("secret")
-)
-
 func main() {
 	db.StartDB()
 	mux := mux.NewRouter()
