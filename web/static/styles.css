@@ -164,3 +164,21 @@ button {
     padding: 5px 10px;
 }
 
+.chat-users {
+    flex: 1;
+    border-right: 1px solid #ccc;
+    overflow-y: auto;
+}
+
+.chat-users div {
+    color: #009882;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.chat-users div:hover {
+    background-color: #e0e0e0; /* Change the background color on hover */
+}
+
+

@@ -25,7 +25,7 @@ document.body.addEventListener('submit', async function(event) {
                 alert(result.message); // Show success message
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
-                render();
+                router(history.state);
             } else {
                 alert(result.error); // Show error message
             }
@@ -182,7 +182,6 @@ function loadChatBox() {
 
 // Populate the user list dynamically
     fetchUsers(function(users) {
-        console.log(users);
 
         // Populate the user list dynamically
         const userListDiv = document.querySelector('.chat-users');
@@ -220,10 +219,8 @@ function fetchUsers(callback) {
         // Check if it's an update_users message
         if (message.action === "update_users") {
             const userList = message.data;
-            console.log("hi");
-            console.log(userList);
             // Call a function to update the user list in the UI
-            callback(userList);
+            callback(Object.values(userList));
         }
     });
 }
@@ -244,10 +241,13 @@ function sendMessage(userID) {
 
 // Listen for incoming messages
 socket.onmessage = function(event) {
-    const chatMessagesDiv = document.querySelector('.chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.textContent = event.data;
-    chatMessagesDiv.appendChild(messageDiv);
+    const message = JSON.parse(event.data);
+    if (message.action !== "update_users") {
+        const chatMessagesDiv = document.querySelector('.chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = event.data;
+        chatMessagesDiv.appendChild(messageDiv);
+    }    
 };
 
 function router(state) {
@@ -297,4 +297,9 @@ function render() {
             break;
     }
 }
+
+window.addEventListener("beforeunload", () => {
+    console.log("Beforeunload event triggered.");
+    socket.close();
+});
 window.onload = checkAuthentication;
