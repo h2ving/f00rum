@@ -15,7 +15,7 @@ type Client struct {
 
 type Hub struct {
 	// Registered clients.
-	Clients map[*Client]int
+	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
 	Broadcast chan []byte
@@ -29,7 +29,13 @@ type Hub struct {
 	FetchUsers chan *map[int]string
 }
 
-type WSMessage struct {
+type FetchMessage struct {
 	Action string      `json:"action"`
 	Data   interface{} `json:"data,omitempty"`
+}
+
+type Message struct {
+	Sender    string `json:"sender"`
+	Recipient string `json:"recipient"`
+	Content   string `json:"content"`
 }

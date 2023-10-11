@@ -7,7 +7,7 @@ import (
 
 func fetchAndSendUsers(conn *websocket.Conn) {
 	users, _ := GetUsers() // Assuming GetUsers fetches users from the DB
-	response := WSMessage{
+	response := FetchMessage{
 		Action: "update_users",
 		Data:   users,
 	}

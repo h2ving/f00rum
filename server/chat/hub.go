@@ -1,15 +1,13 @@
 package chat
 
 import (
-	"encoding/json"
-	"log"
 	"real-time-forum/db"
 )
 
 func NewHub() *Hub {
 	return &Hub{
 		Broadcast:  make(chan []byte),
-		Clients:    make(map[*Client]int),
+		Clients:    make(map[*Client]bool),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		FetchUsers: make(chan *map[int]string),
@@ -19,30 +17,8 @@ func NewHub() *Hub {
 func (h *Hub) Run() {
 	for {
 		select {
-		case <-h.FetchUsers:
-			userList, err := GetUsers() // Assume this function fetches the user list from the DB
-			if err != nil {
-				log.Println("Failed to fetch users:", err)
-				continue
-			}
-
-			userListJSON, err := json.Marshal(userList)
-			if err != nil {
-				log.Println("Failed to marshal user list:", err)
-				continue
-			}
-
-			// Broadcast to all connected clients
-			for client := range h.Clients {
-				select {
-				case client.Send <- userListJSON:
-				default:
-					close(client.Send)
-					delete(h.Clients, client)
-				}
-			}
 		case client := <-h.Register:
-			h.Clients[client] = 1
+			h.Clients[client] = true
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
@@ -82,17 +58,4 @@ func getMessages(senderID, recipientID int, limit int) ([]string, error) {
 		messages = append(messages, message)
 	}
 	return messages, nil
-}
-
-func loadChatHistory(h *Hub, senderID, recipientID int) {
-	messages, err := getMessages(senderID, recipientID, 10)
-	if err != nil {
-		log.Println("Failed to load chat history:", err)
-		return
-	}
-
-	client := FindClientBySenderID(h, senderID)
-	for _, message := range messages {
-		client.Send <- []byte(message)
-	}
 }

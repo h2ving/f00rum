@@ -2,11 +2,12 @@ package chat
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"real-time-forum/server"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -74,6 +75,8 @@ func (c *Client) readPump() {
 		case "fetch_users":
 			// Handle the fetch_users action here
 			fetchAndSendUsers(c.Conn)
+		case "message":
+
 		default:
 			// Handle other actions as needed
 		}
@@ -140,15 +143,6 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
-}
-
-func FindClientBySenderID(h *Hub, senderID int) *Client {
-	for client, id := range h.Clients {
-		if id == senderID {
-			return client
-		}
-	}
-	return nil // Return nil if no client is found with the given senderID
 }
 
 func HandleNewUserWsAlert(newUser server.User, h *Hub) {

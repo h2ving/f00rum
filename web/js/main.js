@@ -22,9 +22,10 @@ document.body.addEventListener('submit', async function(event) {
 
             // Handle server's response
             if (response.ok) {
+                localStorage.setItem('username', JSON.stringify(data.username));
+                //clearLocalStorage();
                 alert(result.message); // Show success message
-                // You can redirect the user to the forum page
-                history.pushState({ page: 'forum' }, 'Forum', '/forum');
+                // Redirect the user to the forum page
                 router(history.state);
             } else {
                 alert(result.error); // Show error message
@@ -57,6 +58,8 @@ document.body.addEventListener('submit', async function(event) {
 
             // Handle server's response
             if (response.ok) {
+                localStorage.setItem('username', JSON.stringify(data.username));
+                //clearLocalStorage();
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
                 router(history.state);
@@ -84,6 +87,7 @@ document.body.addEventListener('click', async function(event) {
 
             // Handle server's response
             if (response.ok) {
+                //localStorage.clear();
                 // Redirect the user to the login page
                 history.pushState({ page: 'login' }, 'Login', '/login');
                 router(history.state);
@@ -103,18 +107,22 @@ window.addEventListener('popstate', function(event) {
         router(event.state);
     }
 });
-window.addEventListener("beforeunload", () => {
-    socket.close();
-});
+
 
 // Load the forum content
 function loadForumContent() {
     const header = document.querySelector('header');
+    const nameParagraph = document.createElement('p'); // Create a new <p> element
+    nameParagraph.id = 'name'; // Set the id attribute
+    const username = localStorage.getItem('username');
+    //const username = "Malvo"
+    nameParagraph.textContent = username.toString();
     const loggedIn = `
             <a href="#" id="buttonHome" class="button-home">Real-Time Forum</a>
             <button id="logout" type="button">Log out</button>
     `;
     header.innerHTML = loggedIn;
+    header.insertBefore(nameParagraph, header.querySelector('#logout'));
     loadChatBox()
 }
 
@@ -239,6 +247,13 @@ function sendMessage(userID) {
     input.value = ''; // Clear the input
 }
 
+// Function to clear localStorage after a specified time (e.g., 15 minutes)
+function clearLocalStorage() {
+    setTimeout(function () {
+        localStorage.clear();
+    }, 15 * 60 * 1000); // Convert minutes to milliseconds
+}
+
 // Listen for incoming messages
 socket.onmessage = function(event) {
     const message = JSON.parse(event.data);
@@ -298,8 +313,4 @@ function render() {
     }
 }
 
-window.addEventListener("beforeunload", () => {
-    console.log("Beforeunload event triggered.");
-    socket.close();
-});
 window.onload = checkAuthentication;

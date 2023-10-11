@@ -41,6 +41,11 @@ header {
     margin: 0 10px 0 0;
 }
 
+#name {
+    margin-left: 75%;
+    font-size: 18px;
+}
+
 /* Login form in header */
 #loginForm {
 
