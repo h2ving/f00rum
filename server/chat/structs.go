@@ -35,6 +35,7 @@ type FetchMessage struct {
 }
 
 type Message struct {
+	Action 	  string `json:"action"`
 	Sender    string `json:"sender"`
 	Recipient string `json:"recipient"`
 	Content   string `json:"content"`

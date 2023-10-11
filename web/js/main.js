@@ -1,4 +1,3 @@
-// Event listeners
 document.body.addEventListener('submit', async function(event) {
     if (event.target.id === 'registrationForm') {
         event.preventDefault(); // Prevent default form submission
@@ -108,12 +107,12 @@ window.addEventListener('popstate', function(event) {
     }
 });
 
-
 // Load the forum content
 function loadForumContent() {
     const header = document.querySelector('header');
     const nameParagraph = document.createElement('p'); // Create a new <p> element
     nameParagraph.id = 'name'; // Set the id attribute
+    //TODO Local Storage Korda
     const username = localStorage.getItem('username');
     //const username = "Malvo"
     nameParagraph.textContent = username.toString();
@@ -163,11 +162,10 @@ function loadLoginPage() {
     container.innerHTML = register;
 
 }
-
-let socket = new WebSocket("ws://localhost:8080/ws");
-
+let socket;
 
 function loadChatBox() {
+
     const container = document.querySelector('.container');
     container.innerHTML = `
             <div id="chatBox" class="chat-box">
@@ -183,15 +181,31 @@ function loadChatBox() {
         </div>
     </div>
     `;
+    
+    //Const for "enter" keylistener
+    const messageInput = document.getElementById("chatInput");
 
-    // Sample user list. Replace with your actual user data.
-    //const users = ["Alice", "Bob", "Charlie", "David"];
-
+    // Event listeners
+    messageInput.addEventListener("keydown",function(event) {
+    if (event.key === "Enter" &&  !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }});
+    socket = new WebSocket("ws://localhost:8080/ws");
+    socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        if ((message.action !== "update_users") && (message.action === "send_message")) {
+            const chatMessagesDiv = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message.content;
+            messageDiv.classList.add('recipient');
+            chatMessagesDiv.appendChild(messageDiv);
+        }    
+    };
 
 // Populate the user list dynamically
     fetchUsers(function(users) {
 
-        // Populate the user list dynamically
         const userListDiv = document.querySelector('.chat-users');
         users.forEach(user => {
             const userDiv = document.createElement('div');
@@ -199,10 +213,10 @@ function loadChatBox() {
             userDiv.onclick = function() {
                 // Remove highlight from all users
                 document.querySelectorAll('.chat-users div').forEach(div => {
-                    div.classList.remove('selected');
+                    div.classList.remove('selected-user');
                 });
                 // Highlight the clicked user
-                this.classList.add('selected');
+                this.classList.add('selected-user');
             };
             userListDiv.appendChild(userDiv);
         });
@@ -216,15 +230,21 @@ function fetchUsers(callback) {
         const requestData = {
             action: "fetch_users"
         };
+            // Check if the WebSocket is open and ready to send
+    if (socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(requestData));
-
+    } else {
+        // If the WebSocket is not open, queue the fetch operation
+        socket.addEventListener("open", function () {
+            socket.send(JSON.stringify(requestData));
+        });
+    }
 
 
     // Listen for incoming WebSocket messages
     socket.addEventListener("message", (event) => {
         const message = JSON.parse(event.data);
 
-        // Check if it's an update_users message
         if (message.action === "update_users") {
             const userList = message.data;
             // Call a function to update the user list in the UI
@@ -234,15 +254,24 @@ function fetchUsers(callback) {
 }
 
 // Function to send a message
-function sendMessage(userID) {
+function sendMessage() {
     const input = document.getElementById('chatInput');
     const message = input.value;
     if (message.trim() === '') return; // Don't send empty messages
-    let jsonData = {}
-    jsonData["action"] = "send_message"
-    jsonData["to"] = parseInt(userID)
-    jsonData["message"] = message
-    socket.send(JSON.stringify(jsonData))
+    let jsonData = {};
+    jsonData["action"] = "send_message";
+    jsonData["sender"] = "Malvo";
+    jsonData["recipient"] = document.querySelector('.selected-user').textContent;
+    jsonData["content"] = message;
+    socket.send(JSON.stringify(jsonData));
+
+    // Update chat-messages with message
+    const chatMessagesDiv = document.querySelector('.chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    messageDiv.classList.add('sender');
+    chatMessagesDiv.appendChild(messageDiv);
+    
 
     input.value = ''; // Clear the input
 }
@@ -254,16 +283,6 @@ function clearLocalStorage() {
     }, 15 * 60 * 1000); // Convert minutes to milliseconds
 }
 
-// Listen for incoming messages
-socket.onmessage = function(event) {
-    const message = JSON.parse(event.data);
-    if (message.action !== "update_users") {
-        const chatMessagesDiv = document.querySelector('.chat-messages');
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = event.data;
-        chatMessagesDiv.appendChild(messageDiv);
-    }    
-};
 
 function router(state) {
     switch (state.page) {
@@ -278,7 +297,6 @@ function router(state) {
             break;
     }
 }
-
 
 
 

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS 'ChatMessages' (
     FOREIGN KEY (senderID) REFERENCES Users(userID),
     FOREIGN KEY (receiverID) REFERENCES Users(userID)
 );
+-- TODO chatMessages createdat 2 tundi ette
 
 CREATE TABLE IF NOT EXISTS `Sessions` (
     `sessionID` TEXT PRIMARY KEY,

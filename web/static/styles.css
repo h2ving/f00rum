@@ -175,15 +175,46 @@ button {
     overflow-y: auto;
 }
 
-.chat-users div {
+.chat-users div:not(.selected-user) {
     color: #009882;
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-.chat-users div:hover {
+.chat-users div:not(.selected-user):hover {
     background-color: #e0e0e0; /* Change the background color on hover */
 }
 
+/* Define the CSS for the selected user element */
+.selected-user {
+    background-color: #749a9a;; /* Set the background color to a blue shade (you can change this color) */
+    color: #fff; /* Set the text color to white (you can change this color) */
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
+/* Style for sender messages (on the right) */
+.sender {
+    background-color: #71c084; /* Set the background color for sender messages */
+    color: white; /* Set the text color for sender messages */
+    float: right; /* Align sender messages to the right */
+    clear: both; /* Ensure sender messages do not overlap with previous elements */
+    padding: 10px; /* Add some padding to sender messages */
+}
+
+/* Style for recipient messages (on the left) */
+.recipient {
+    background-color: #009882; /* Set the background color for recipient messages */
+    color: white; /* Set the text color for recipient messages */
+    float: left; /* Align recipient messages to the left */
+    clear: both; /* Ensure recipient messages do not overlap with previous elements */
+    padding: 10px; /* Add some padding to recipient messages */
+}
+
+/* Style for the chat container to make it scrollable */
+.chat-messages {
+    max-height: 400px; /* Set a maximum height for the chat messages */
+    overflow-y: auto; /* Enable vertical scrolling for overflow content */
+}

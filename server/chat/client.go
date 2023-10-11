@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"real-time-forum/server"
+	"real-time-forum/server/functions"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -75,7 +76,8 @@ func (c *Client) readPump() {
 		case "fetch_users":
 			// Handle the fetch_users action here
 			fetchAndSendUsers(c.Conn)
-		case "message":
+		case "send_message":
+			sendMessage(messageData, c)
 
 		default:
 			// Handle other actions as needed
@@ -137,7 +139,7 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)}
+	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256), ID: functions.UserID, Username: functions.Username, Online: true}
 	hub.Register <- client
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
