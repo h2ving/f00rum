@@ -164,7 +164,7 @@ header {
     flex: none;
 }
 
-button {
+#sendButton{
     margin: 10px;
     padding: 5px 10px;
 }

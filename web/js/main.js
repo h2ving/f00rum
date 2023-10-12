@@ -1,3 +1,5 @@
+import ChatBox from "./chatbox.js";
+
 document.body.addEventListener('submit', async function(event) {
     if (event.target.id === 'registrationForm') {
         event.preventDefault(); // Prevent default form submission
@@ -122,7 +124,7 @@ function loadForumContent() {
     `;
     header.innerHTML = loggedIn;
     header.insertBefore(nameParagraph, header.querySelector('#logout'));
-    loadChatBox()
+    ChatBox.init()
 }
 
 // Load the login page with a registration option
@@ -162,130 +164,6 @@ function loadLoginPage() {
     container.innerHTML = register;
 
 }
-let socket;
-
-function loadChatBox() {
-
-    const container = document.querySelector('.container');
-    container.innerHTML = `
-            <div id="chatBox" class="chat-box">
-        <div class="chat-users">
-            <!-- Dynamically populated list of users will appear here -->
-        </div>
-        <div class="chat-display">
-            <div class="chat-messages">
-                <!-- Chat messages will appear here -->
-            </div>
-            <input type="text" id="chatInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-    `;
-    
-    //Const for "enter" keylistener
-    const messageInput = document.getElementById("chatInput");
-
-    // Event listeners
-    messageInput.addEventListener("keydown",function(event) {
-    if (event.key === "Enter" &&  !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }});
-    socket = new WebSocket("ws://localhost:8080/ws");
-    socket.onmessage = function(event) {
-        const message = JSON.parse(event.data);
-        if (message.action === "send_message") {
-            const chatMessagesDiv = document.querySelector('.chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = message.content;
-            messageDiv.classList.add('recipient');
-            chatMessagesDiv.appendChild(messageDiv);
-            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-        }    
-    };
-
-// Populate the user list dynamically
-    fetchUsers(function(users) {
-
-        const userListDiv = document.querySelector('.chat-users');
-        users.forEach(user => {
-            const userDiv = document.createElement('div');
-            userDiv.textContent = user;
-            userDiv.onclick = function() {
-                // Remove highlight from all users
-                document.querySelectorAll('.chat-users div').forEach(div => {
-                    div.classList.remove('selected-user');
-                });
-                // Highlight the clicked user
-                this.classList.add('selected-user');
-            };
-            userListDiv.appendChild(userDiv);
-        });
-    });
-}
-
-// Function to fetch users from the server via WebSocket
-function fetchUsers(callback) {
-
-        // Send a message to request the user list
-        const requestData = {
-            action: "fetch_users"
-        };
-            // Check if the WebSocket is open and ready to send
-    if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(requestData));
-    } else {
-        // If the WebSocket is not open, queue the fetch operation
-        socket.addEventListener("open", function () {
-            socket.send(JSON.stringify(requestData));
-        });
-    }
-
-
-    // Listen for incoming WebSocket messages
-    socket.addEventListener("message", (event) => {
-        const message = JSON.parse(event.data);
-
-        if (message.action === "update_users") {
-            const userList = message.data;
-            // Call a function to update the user list in the UI
-            callback(Object.values(userList));
-        }
-    });
-}
-
-// Function to send a message
-function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value;
-    if (message.trim() === '') return; // Don't send empty messages
-    let jsonData = {};
-    jsonData["action"] = "send_message";
-    jsonData["sender"] = "Malvo";
-    jsonData["recipient"] = document.querySelector('.selected-user').textContent;
-    jsonData["content"] = message;
-    socket.send(JSON.stringify(jsonData));
-
-    // Update chat-messages with message
-    const chatMessagesDiv = document.querySelector('.chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
-    messageDiv.classList.add('sender');
-    chatMessagesDiv.appendChild(messageDiv);
-
-    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-    
-
-    input.value = ''; // Clear the input
-}
-
-// Function to clear localStorage after a specified time (e.g., 15 minutes)
-function clearLocalStorage() {
-    setTimeout(function () {
-        localStorage.clear();
-    }, 15 * 60 * 1000); // Convert minutes to milliseconds
-}
-
 
 function router(state) {
     switch (state.page) {
@@ -300,8 +178,6 @@ function router(state) {
             break;
     }
 }
-
-
 
 async function checkAuthentication() {
     try {
@@ -319,6 +195,7 @@ async function checkAuthentication() {
         // Handle the error, maybe show a message to the user or reload the login page
     }
 }
+
 function render() {
     const currentPath = window.location.pathname;
     switch (currentPath) {
