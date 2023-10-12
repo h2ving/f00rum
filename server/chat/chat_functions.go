@@ -1,19 +1,27 @@
 package chat
 
 import (
+	"fmt"
 	"log"
 	"real-time-forum/db"
-	"fmt"
-	"github.com/gorilla/websocket"
 )
 
-func fetchAndSendUsers(conn *websocket.Conn) {
+func fetchChatHistory() {
+	// history, _ := GetChatHistory()
+}
+
+func GetChatHistory() {
+
+}
+
+func fetchUsers(c *Client) {
 	users, _ := GetUsers() // Assuming GetUsers fetches users from the DB
 	response := FetchMessage{
 		Action: "update_users",
 		Data:   users,
 	}
-	conn.WriteJSON(response)
+	c.Username = users[c.ID]
+	c.Conn.WriteJSON(response)
 }
 
 func GetUsers() (map[int]string, error) {
@@ -42,8 +50,8 @@ func sendMessage(messageData map[string]interface{}, c *Client) {
 	if !ok {
 		log.Printf("Invalid message format: %v", messageData)
 	}
-	if (c == nil) {
-		fmt.Println("client nil");
+	if c == nil {
+		fmt.Println("client nil")
 	}
 	var recipient *Client
 	for key, value := range c.Hub.Clients {
@@ -55,9 +63,9 @@ func sendMessage(messageData map[string]interface{}, c *Client) {
 		}
 	}
 	if recipient == nil {
-        log.Printf("Recipient not found: %v", messageData["recipient"])
-        return
-    }
+		log.Printf("Recipient not found: %v", messageData["recipient"])
+		return
+	}
 	err := storeMessage(c.ID, recipient.ID, message)
 	if err != nil {
 		return

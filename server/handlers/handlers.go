@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"real-time-forum/db"
+	"real-time-forum/server"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func CheckAuth(w http.ResponseWriter, r *http.Request) {
 
 		// Check the database for the session ID
 		var expiresAt time.Time
-		err = db.Dbase.QueryRow("SELECT expiresAt FROM Sessions WHERE sessionID = ?", sessionID).Scan(&expiresAt)
+		err = db.Dbase.QueryRow("SELECT userID, expiresAt FROM Sessions WHERE sessionID = ?", sessionID).Scan(&server.UserID, &expiresAt)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				isAuthenticated = false

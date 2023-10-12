@@ -6,7 +6,6 @@ func NewHub() *Hub {
 		Clients:    make(map[*Client]bool),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
-		FetchUsers: make(chan *map[int]string),
 	}
 }
 

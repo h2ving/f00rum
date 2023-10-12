@@ -1,5 +1,7 @@
 package server
 
+var UserID int
+
 type User struct {
 	UserID    int
 	Username  string

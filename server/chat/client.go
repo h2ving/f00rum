@@ -2,27 +2,11 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"real-time-forum/server"
-	"real-time-forum/server/functions"
-	"time"
-
-	"github.com/gorilla/websocket"
-)
-
-const (
-	// Time allowed to write a message to the peer
-	writeWait = 10 * time.Second
-
-	// Time allowed to read the next pong message from the peer
-	pongWait = 60 * time.Second
-
-	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
-
-	// Maximum message size allowed from peer
-	maxMessageSize = 512
 )
 
 var (
@@ -44,10 +28,9 @@ func (c *Client) readPump() {
 	defer func() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
+		log.Println(c.Username, " disconnected")
+
 	}()
-	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		_, message, err := c.Conn.ReadMessage()
 
@@ -75,10 +58,12 @@ func (c *Client) readPump() {
 		switch action {
 		case "fetch_users":
 			// Handle the fetch_users action here
-			fetchAndSendUsers(c.Conn)
+			fetchUsers(c)
 		case "send_message":
 			sendMessage(messageData, c)
-
+		case "fetch_chat_history":
+			fmt.Println(messageData)
+			// fetchChatHistory(messageData, c.ID)
 		default:
 			// Handle other actions as needed
 		}
@@ -92,15 +77,12 @@ func (c *Client) readPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
-	ticker := time.NewTicker(pingPeriod)
 	defer func() {
-		ticker.Stop()
 		c.Conn.Close()
 	}()
 	for {
 		select {
 		case message, ok := <-c.Send:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -123,23 +105,19 @@ func (c *Client) writePump() {
 			if err := w.Close(); err != nil {
 				return
 			}
-		case <-ticker.C:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
 		}
 	}
 }
 
 // ServeWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	log.Println(server.UserID, " connected")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256), ID: functions.UserID, Username: functions.Username, Online: true}
+	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256), ID: server.UserID, Online: true}
 	hub.Register <- client
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
