@@ -194,12 +194,13 @@ function loadChatBox() {
     socket = new WebSocket("ws://localhost:8080/ws");
     socket.onmessage = function(event) {
         const message = JSON.parse(event.data);
-        if ((message.action !== "update_users") && (message.action === "send_message")) {
+        if (message.action === "send_message") {
             const chatMessagesDiv = document.querySelector('.chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message.content;
             messageDiv.classList.add('recipient');
             chatMessagesDiv.appendChild(messageDiv);
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
         }    
     };
 
@@ -271,6 +272,8 @@ function sendMessage() {
     messageDiv.textContent = message;
     messageDiv.classList.add('sender');
     chatMessagesDiv.appendChild(messageDiv);
+
+    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     
 
     input.value = ''; // Clear the input
