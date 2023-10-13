@@ -197,6 +197,7 @@ header {
 
 /* Style for sender messages (on the right) */
 .sender {
+    margin-top: 5px;
     background-color: #71c084; /* Set the background color for sender messages */
     color: white; /* Set the text color for sender messages */
     float: right; /* Align sender messages to the right */
@@ -206,6 +207,7 @@ header {
 
 /* Style for recipient messages (on the left) */
 .recipient {
+    margin-top: 5px;
     background-color: #009882; /* Set the background color for recipient messages */
     color: white; /* Set the text color for recipient messages */
     float: left; /* Align recipient messages to the left */

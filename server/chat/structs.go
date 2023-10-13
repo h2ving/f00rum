@@ -35,8 +35,16 @@ type FetchMessage struct {
 }
 
 type Message struct {
-	Action 	  string `json:"action"`
+	Action    string `json:"action"`
 	Sender    string `json:"sender"`
 	Recipient string `json:"recipient"`
 	Content   string `json:"content"`
+}
+
+type ChatMessage struct {
+	MessageID  int
+	SenderID   int
+	ReceiverID int
+	Message    string
+	CreatedAt  string
 }

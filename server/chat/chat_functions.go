@@ -6,12 +6,42 @@ import (
 	"real-time-forum/db"
 )
 
-func fetchChatHistory() {
-	// history, _ := GetChatHistory()
+// TODO throttle load
+func fetchChatHistory(c *Client, recipientID int) {
+
+	chatHistory, err := GetChatHistory(c.ID, recipientID)
+	if err != nil {
+		log.Printf("Error fetching chat history: %v", err)
+		return
+	}
+
+	response := make(map[string]interface{})
+	response["action"] = "chat_history"
+	response["content"] = chatHistory
+
+	c.Conn.WriteJSON(response)
 }
 
-func GetChatHistory() {
+func GetChatHistory(senderID, recipientID int) ([]ChatMessage, error) {
 
+	// Query the database to retrieve chat history
+	query := "SELECT * FROM ChatMessages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?) ORDER BY createdAt"
+	rows, err := db.Dbase.Query(query, senderID, recipientID, recipientID, senderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var chatHistory []ChatMessage
+	for rows.Next() {
+		var msg ChatMessage
+		if err := rows.Scan(&msg.MessageID, &msg.SenderID, &msg.ReceiverID, &msg.Message, &msg.CreatedAt); err != nil {
+			return nil, err
+		}
+		chatHistory = append(chatHistory, msg)
+	}
+
+	return chatHistory, nil
 }
 
 func fetchUsers(c *Client) {

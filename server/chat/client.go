@@ -2,11 +2,11 @@ package chat
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"real-time-forum/server"
+	"strconv"
 )
 
 var (
@@ -62,8 +62,18 @@ func (c *Client) readPump() {
 		case "send_message":
 			sendMessage(messageData, c)
 		case "fetch_chat_history":
-			fmt.Println(messageData)
-			// fetchChatHistory(messageData, c.ID)
+			// Convert the "user" value to an integer
+			userStr, ok := messageData["user"].(string)
+			if !ok {
+				log.Printf("Invalid user format: %v", messageData)
+				continue
+			}
+			userInt, err := strconv.Atoi(userStr)
+			if err != nil {
+				log.Printf("Error converting user to int: %v", err)
+				continue
+			}
+			fetchChatHistory(c, userInt)
 		default:
 			// Handle other actions as needed
 		}

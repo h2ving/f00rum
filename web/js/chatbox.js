@@ -29,29 +29,11 @@ const ChatBox = (function () {
         setupEventListeners(); // Set up other event listeners
 
         // Dynamically populate the user list
-        fetchUsers(function (users) {
-            const userListDiv = document.querySelector(".chat-users");
-            users.forEach(user => {
-                const userDiv = document.createElement("div");
-                userDiv.textContent = user;
-                userDiv.onclick = function () {
-                    // Remove highlight from all users
-                    document.querySelectorAll(".chat-users div").forEach(div => {
-                        div.classList.remove("selected-user");
-                    });
-                    // Highlight the clicked user
-                    this.classList.add("selected-user");
-                    console.log(this.textContent);
-                    handleUserSelection(this.textContent);
-                };
-                userListDiv.appendChild(userDiv);
-            });
-        });
+        fetchUsers();
     }
 
     // Function to fetch users from the server via WebSocket
-    function fetchUsers(callback) {
-
+    function fetchUsers() {
         // Send a message to request the user list
         const requestData = {
             action: "fetch_users"
@@ -65,18 +47,6 @@ const ChatBox = (function () {
                 socket.send(JSON.stringify(requestData));
             });
         }
-
-
-        // Listen for incoming WebSocket messages
-        socket.addEventListener("message", (event) => {
-            const message = JSON.parse(event.data);
-
-            if (message.action === "update_users") {
-                const userList = message.data;
-                // Call a function to update the user list in the UI
-                callback(Object.values(userList));
-            }
-        });
     }
 
     // Function to set up the WebSocket connection
@@ -102,8 +72,9 @@ const ChatBox = (function () {
         });
     }
 
+
     // Function to handle user selection
-    function handleUserSelection(selectedUser) {
+    function handleUserSelection(key) {
         // Clear the chat-messages div
         const chatMessagesDiv = document.querySelector(".chat-messages");
         chatMessagesDiv.innerHTML = "";
@@ -111,7 +82,7 @@ const ChatBox = (function () {
         // Send a request to the server to fetch chat history for the selected user
         const requestData = {
             action: "fetch_chat_history",
-            user: selectedUser, // You may need to modify your server to handle this request
+            user: key, // You may need to modify your server to handle this request
         };
 
         // Send the request via WebSocket
@@ -131,16 +102,37 @@ const ChatBox = (function () {
             displayMessage(message);
         } else if (message.action === "chat_history") {
             // Display chat history
+            //console.log(message.content)
             displayChatHistory(message.content);
+        } else if (message.action === "update_users") {
+            // Display chat history
+            displayUsers(message.data);
         }
-        // else if (message.action === "update_users") {
-        //     // Display chat history
-        //     displayUsers(message.content);
     }
 
-    // function displayUsers(message) {
-    //     }
-    // }
+    let Key;
+
+
+    function displayUsers(users) {
+        const userListDiv = document.querySelector(".chat-users");
+        Object.entries(users).forEach(([key, user]) => {
+            const userDiv = document.createElement("div");
+            userDiv.textContent = user;
+            userDiv.id = `${key}`;
+            userDiv.onclick = function () {
+                // Remove highlight from all users
+                document.querySelectorAll(".chat-users div").forEach(div => {
+                    div.classList.remove("selected-user");
+                });
+                // Highlight the clicked user
+                this.classList.add("selected-user");
+                Key = key;
+                console.log("this is ", Key)
+                handleUserSelection(key);
+            };
+            userListDiv.appendChild(userDiv);
+        });
+    }
 
     // Function to display a message in the chat
     function displayMessage(message) {
@@ -155,12 +147,17 @@ const ChatBox = (function () {
     // Function to display chat history
     function displayChatHistory(history) {
         const chatMessagesDiv = document.querySelector(".chat-messages");
+        console.log(history)
         history.forEach((message) => {
             const messageDiv = document.createElement("div");
-            messageDiv.textContent = message.content;
-            messageDiv.classList.add(message.class === "sender" ? "sender" : "recipient");
+            messageDiv.textContent = message["Message"];
+            console.log(message)
+            console.log(typeof message["SenderID"])
+            console.log(typeof +Key)
+            messageDiv.classList.add(message["SenderID"] === +Key ? "sender" : "recipient");
             chatMessagesDiv.appendChild(messageDiv);
         });
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     }
 
     // Function to send a message

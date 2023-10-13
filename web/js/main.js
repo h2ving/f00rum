@@ -88,7 +88,7 @@ document.body.addEventListener('click', async function(event) {
 
             // Handle server's response
             if (response.ok) {
-                //localStorage.clear();
+                localStorage.clear();
                 // Redirect the user to the login page
                 history.pushState({ page: 'login' }, 'Login', '/login');
                 router(history.state);
