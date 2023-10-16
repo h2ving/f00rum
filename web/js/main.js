@@ -1,4 +1,5 @@
 import ChatBox from "./chatbox.js";
+import { initForumPage } from "./forum.js";
 
 document.body.addEventListener('submit', async function(event) {
     if (event.target.id === 'registrationForm') {
@@ -124,6 +125,7 @@ function loadForumContent() {
     `;
     header.innerHTML = loggedIn;
     header.insertBefore(nameParagraph, header.querySelector('#logout'));
+    initForumPage()
     ChatBox.init()
 }
 
