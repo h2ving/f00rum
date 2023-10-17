@@ -148,16 +148,18 @@ const ChatBox = (function () {
     function displayChatHistory(history) {
         const chatMessagesDiv = document.querySelector(".chat-messages");
         console.log(history)
-        history.forEach((message) => {
-            const messageDiv = document.createElement("div");
-            messageDiv.textContent = message["Message"];
-            console.log(message)
-            console.log(typeof message["SenderID"])
-            console.log(typeof +Key)
-            messageDiv.classList.add(message["SenderID"] === +Key ? "sender" : "recipient");
-            chatMessagesDiv.appendChild(messageDiv);
-        });
-        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        if (!(history === null)) {
+            history.forEach((message) => {
+                const messageDiv = document.createElement("div");
+                messageDiv.textContent = message["Message"];
+                console.log(message)
+                console.log(typeof message["SenderID"])
+                console.log(typeof +Key)
+                messageDiv.classList.add(message["SenderID"] === +Key ? "sender" : "recipient");
+                chatMessagesDiv.appendChild(messageDiv);
+            });
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
     }
 
     // Function to send a message
