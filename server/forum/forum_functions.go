@@ -195,3 +195,24 @@ func GetLikesAndDislikesCount(postID, commentID int) (int, int, error) {
 
     return likes, dislikes, nil
 }
+
+// GetCategories retrieves a list of categories.
+func GetCategories() ([]Category, error) {
+    query := "SELECT * FROM Categories"
+    rows, err := db.Dbase.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var categories []Category
+    for rows.Next() {
+        var category Category
+        if err := rows.Scan(&category.CategoryID, &category.Title); err != nil {
+            return nil, err
+        }
+        categories = append(categories, category)
+    }
+
+    return categories, nil
+}

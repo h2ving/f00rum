@@ -14,7 +14,7 @@ function loadForumContent() {
     container.innerHTML = `
         <div id="forum" class="forum-container">
             <h1>Forum</h1>
-            <button id="createThreadButton">Create New Thread</button>
+            <button id="create-thread-button">Create New Thread</button>
             <div id="threads" class="threads">
                 <!-- Dynamically populated list of threads will appear here -->
             </div>
@@ -29,7 +29,7 @@ function loadForumContent() {
                 </form>
             </div>
         </div>
-        <div id="createThreadModal" class="modal">
+        <div id="createThreadModal" class="modal" >
             <div class="modal-content">
                 <span id="closeModalButton" class="close-button">&times;</span>
                 <h2>Create a New Thread</h2>
@@ -45,7 +45,6 @@ function loadForumContent() {
             </div>
         </div>
     `;
-
     // Fetch and populate the list of threads
     fetchThreads();
 
@@ -57,11 +56,16 @@ function loadForumContent() {
 function fetchCategories() {
     // Make an API request to get the list of categories
     fetch('/api/categories')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            const modalCategorySelect = document.getElementById('modalCategory');
+            console.log('Received categories data:', data);
 
-            // Populate the category options dynamically
+            const modalCategorySelect = document.getElementById('modalCategory');
             data.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.categoryID;
@@ -73,6 +77,7 @@ function fetchCategories() {
             console.error('Error fetching categories:', error);
         });
 }
+
 
 // Function to show the create thread modal
 function showCreateThreadModal() {
@@ -88,12 +93,8 @@ function hideCreateThreadModal() {
 
 // Fetch and populate the list of threads with categoryID query parameter
 function fetchThreads() {
-    // Use URLSearchParams to parse the query parameters
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const categoryID = urlSearchParams.get("categoryID");
-
     // Make an API request to get the list of threads with the categoryID
-    fetch(`/api/threads?categoryID=${categoryID}`)
+    fetch(`/api/threads`)
         .then(response => response.json())
         .then(data => {
             displayThreads(data);
@@ -195,7 +196,7 @@ function setupEventListeners() {
     });
 
     // Event listener for "Create New Thread" button
-    const createThreadButton = document.getElementById('createThreadButton');
+    const createThreadButton = document.getElementById('create-thread-button');
     createThreadButton.addEventListener('click', () => {
         showCreateThreadModal();
     });

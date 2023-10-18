@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("/api/posts", handlers.CreatePostHandler).Methods("POST")
 	mux.HandleFunc("/api/comments", handlers.CreateCommentHandler).Methods("POST")
 	mux.HandleFunc("/api/likesdislikes", handlers.LikeDislikeHandler).Methods("POST")
+	mux.HandleFunc("/api/categories", handlers.GetCategoriesHandler).Methods("GET")
 
 
 	// Catch-all route to serve index.html for all other routes

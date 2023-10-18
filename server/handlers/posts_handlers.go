@@ -124,7 +124,7 @@ func GetThreadsHandler(w http.ResponseWriter, r *http.Request) {
 	categoryIDinString := r.URL.Query().Get("categoryID")
 	categoryID, err := strconv.Atoi(categoryIDinString)
 	if err != nil {
-		fmt.Println("Error parsing categoryID to int")
+		fmt.Println("Error parsing categoryID to int", err)
 		http.Error(w, "Invalid categoryID", http.StatusInternalServerError)
 		return
 	}
@@ -168,4 +168,22 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
+}
+
+func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+	categories, err := forum.GetCategories()
+	if err != nil {
+		fmt.Println("Failed to get categories")
+		return
+	}
+
+	response, err := json.Marshal(categories)
+	if err != nil {
+        http.Error(w, "Failed to fetch categories", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write(response)
 }
