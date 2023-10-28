@@ -3,7 +3,7 @@
 // Wrap your code in a module for better encapsulation
 const ChatBox = (function () {
     let socket;
-
+    let selectedUser;
 
     // Function to initialize the chat app
     function init() {
@@ -23,7 +23,6 @@ const ChatBox = (function () {
               </div>
             </div>
           `;
-
 
         setupSocket(); // Set up the WebSocket connection
         setupEventListeners(); // Set up other event listeners
@@ -71,27 +70,47 @@ const ChatBox = (function () {
             sendMessage(); // Call the sendMessage() function from the ChatBox module
         });
     }
-
-
-    // Function to handle user selection
-    function handleUserSelection(key) {
+    let currentPage; // Initialize with the first page
+    let chatMessagesDiv;
+    let allFetched;
+    let scrollRatio;
+    let start = false;
+    // Function to handle user selection and load chat history
+    function fetchMessages(key) {
         // Clear the chat-messages div
-        const chatMessagesDiv = document.querySelector(".chat-messages");
-        chatMessagesDiv.innerHTML = "";
+        chatMessagesDiv = document.querySelector(".chat-messages");
+        if (selectedUser !== key) {
+            allFetched = false;
+            currentPage = 1;
+            selectedUser = key;
+            start = true
+            chatMessagesDiv.innerHTML = "";
+        }
 
-        // Send a request to the server to fetch chat history for the selected user
+        // Send a request to the server with the current page number
         const requestData = {
             action: "fetch_chat_history",
-            user: key, // You may need to modify your server to handle this request
+            user: key,
+            page: currentPage, // Send the current page
         };
-
         // Send the request via WebSocket
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify(requestData));
-        } else {
-            socket.addEventListener("open", function () {
-                socket.send(JSON.stringify(requestData));
-            });
+        socket.send(JSON.stringify(requestData));
+
+        // Increment the page for the next request
+        currentPage++;
+    }
+    // Function to load more chat history when the user scrolls
+    function loadMoreMessages() {
+        //chatMessagesDiv = document.querySelector(".chat-messages");
+    if (!start) {
+            const scrollOffset = chatMessagesDiv.scrollTop;
+            // Check if the user has scrolled to the top (you can adjust the threshold)
+            if (scrollOffset < 20 && currentPage > 1 && !allFetched) {
+                // Send a request for more chat history
+                fetchMessages(selectedUser);
+            }
+        }else {
+            start = false;
         }
     }
 
@@ -102,7 +121,6 @@ const ChatBox = (function () {
             displayMessage(message);
         } else if (message.action === "chat_history") {
             // Display chat history
-            //console.log(message.content)
             displayChatHistory(message.content);
         } else if (message.action === "update_users") {
             // Display chat history
@@ -110,33 +128,32 @@ const ChatBox = (function () {
         }
     }
 
-    let Key;
 
 
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
+        const username = localStorage.getItem('username');
         Object.entries(users).forEach(([key, user]) => {
-            const userDiv = document.createElement("div");
-            userDiv.textContent = user;
-            userDiv.id = `${key}`;
-            userDiv.onclick = function () {
-                // Remove highlight from all users
-                document.querySelectorAll(".chat-users div").forEach(div => {
-                    div.classList.remove("selected-user");
-                });
-                // Highlight the clicked user
-                this.classList.add("selected-user");
-                Key = key;
-                console.log("this is ", Key)
-                handleUserSelection(key);
-            };
-            userListDiv.appendChild(userDiv);
+            if (user !== username) {
+                const userDiv = document.createElement("div");
+                userDiv.textContent = user;
+                userDiv.id = `${key}`;
+                userDiv.onclick = function () {
+                    // Remove highlight from all users
+                    document.querySelectorAll(".chat-users div").forEach(div => {
+                        div.classList.remove("selected-user");
+                    });
+                    // Highlight the clicked user
+                    this.classList.add("selected-user");
+                    fetchMessages(key);
+                };
+                userListDiv.appendChild(userDiv);
+            }
         });
     }
 
     // Function to display a message in the chat
     function displayMessage(message) {
-        const chatMessagesDiv = document.querySelector(".chat-messages");
         const messageDiv = document.createElement("div");
         messageDiv.textContent = message.content;
         messageDiv.classList.add(message.class === "sender" ? "sender" : "recipient");
@@ -144,21 +161,27 @@ const ChatBox = (function () {
         chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     }
 
+    let savedScrollHeight;
     // Function to display chat history
     function displayChatHistory(history) {
-        const chatMessagesDiv = document.querySelector(".chat-messages");
-        console.log(history)
-        if (!(history === null)) {
+        if (history.length !== 0) {
+            savedScrollHeight = chatMessagesDiv.scrollHeight;
             history.forEach((message) => {
                 const messageDiv = document.createElement("div");
                 messageDiv.textContent = message["Message"];
-                console.log(message)
-                console.log(typeof message["SenderID"])
-                console.log(typeof +Key)
-                messageDiv.classList.add(message["SenderID"] === +Key ? "sender" : "recipient");
-                chatMessagesDiv.appendChild(messageDiv);
+                messageDiv.classList.add(message["SenderID"] === +selectedUser ? "recipient" : "sender");
+                chatMessagesDiv.insertBefore(messageDiv, chatMessagesDiv.firstChild);
             });
-            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            //chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            if (start) {
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                //start = false
+            } else {
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight - savedScrollHeight + 20;
+            }
+            chatMessagesDiv.addEventListener("scroll", loadMoreMessages);
+        } else {
+            allFetched = true
         }
     }
 
@@ -170,7 +193,6 @@ const ChatBox = (function () {
 
         const jsonData = {
             action: "send_message",
-            sender: "Malvo",
             recipient: document.querySelector(".selected-user").textContent,
             content: message,
         };

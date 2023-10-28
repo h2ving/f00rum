@@ -6,10 +6,9 @@ import (
 	"real-time-forum/db"
 )
 
-// TODO throttle load
-func fetchChatHistory(c *Client, recipientID int) {
+func fetchChatHistory(c *Client, recipientID int, page int) {
 
-	chatHistory, err := GetChatHistory(c.ID, recipientID)
+	chatHistory, err := getMessages(c.ID, recipientID, page)
 	if err != nil {
 		log.Printf("Error fetching chat history: %v", err)
 		return
@@ -22,26 +21,40 @@ func fetchChatHistory(c *Client, recipientID int) {
 	c.Conn.WriteJSON(response)
 }
 
-func GetChatHistory(senderID, recipientID int) ([]ChatMessage, error) {
+func getMessages(senderID, recipientID int, page int) ([]ChatMessage, error) {
+	perPage := 10
+	offset := (page - 1) * perPage
 
-	// Query the database to retrieve chat history
-	query := "SELECT * FROM ChatMessages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?) ORDER BY createdAt"
-	rows, err := db.Dbase.Query(query, senderID, recipientID, recipientID, senderID)
+	// Count total amount of message to know when to stop fetching
+	countQuery := "SELECT COUNT(*) FROM ChatMessages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?)"
+	var totalMessages int
+	err := db.Dbase.QueryRow(countQuery, senderID, recipientID, recipientID, senderID).Scan(&totalMessages)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	var chatHistory []ChatMessage
-	for rows.Next() {
-		var msg ChatMessage
-		if err := rows.Scan(&msg.MessageID, &msg.SenderID, &msg.ReceiverID, &msg.Message, &msg.CreatedAt); err != nil {
+	if offset >= totalMessages {
+		return []ChatMessage{}, nil
+	} else {
+		// Modify your SQL query to limit and offset
+		query := "SELECT messageID, senderID, receiverID, message, strftime('%Y-%m-%d %H:%M:%S', createdAt, '+3 hours') AS formattedCreatedAt FROM ChatMessages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?) ORDER BY createdAt DESC LIMIT ? OFFSET ?"
+		rows, err := db.Dbase.Query(query, senderID, recipientID, recipientID, senderID, perPage, offset)
+		if err != nil {
 			return nil, err
 		}
-		chatHistory = append(chatHistory, msg)
-	}
+		defer rows.Close()
 
-	return chatHistory, nil
+		var chatHistory []ChatMessage
+		for rows.Next() {
+			var msg ChatMessage
+			if err := rows.Scan(&msg.MessageID, &msg.SenderID, &msg.ReceiverID, &msg.Message, &msg.CreatedAt); err != nil {
+				return nil, err
+			}
+			chatHistory = append(chatHistory, msg)
+		}
+
+		return chatHistory, nil
+	}
 }
 
 func fetchUsers(c *Client) {
@@ -92,35 +105,29 @@ func sendMessage(messageData map[string]interface{}, c *Client) {
 			}
 		}
 	}
+	var recipientID int
 	if recipient == nil {
-		log.Printf("Recipient not found: %v", messageData["recipient"])
-		return
+		log.Printf("Online recipient not found: %v", messageData["recipient"])
+		err := db.Dbase.QueryRow("SELECT userID FROM Users WHERE username = ?", messageData["recipient"]).Scan(&recipientID)
+		if err != nil {
+			log.Printf("Recipient not found: %v", messageData["recipient"])
+		}
+		err = storeMessage(c.ID, recipientID, message)
+		if err != nil {
+			log.Print("Error while storing message to database")
+			return
+		}
+	} else {
+		err := storeMessage(c.ID, recipient.ID, message)
+		if err != nil {
+			log.Print("Error while storing message to database")
+			return
+		}
 	}
-	err := storeMessage(c.ID, recipient.ID, message)
-	if err != nil {
-		return
-	}
+
 }
 func storeMessage(senderID, recipientID int, message string) error {
 	_, err := db.Dbase.Exec("INSERT INTO ChatMessages (senderID, receiverID, message) VALUES (?, ?, ?)", senderID, recipientID, message)
 	fmt.Println("storeMessage: ", err)
 	return err
-}
-
-func getMessages(senderID, recipientID int, limit int) ([]string, error) {
-	rows, err := db.Dbase.Query("SELECT message FROM ChatMessages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?) ORDER BY createdAt DESC LIMIT ?", senderID, recipientID, recipientID, senderID, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var messages []string
-	for rows.Next() {
-		var message string
-		if err := rows.Scan(&message); err != nil {
-			return nil, err
-		}
-		messages = append(messages, message)
-	}
-	return messages, nil
 }

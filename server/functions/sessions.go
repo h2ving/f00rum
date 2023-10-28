@@ -12,7 +12,7 @@ import (
 
 func GetUserByEmailOrNickname(db *sql.DB, emailOrNickname string) (server.User, error) {
 	query := "SELECT * FROM Users WHERE email = ? OR username = ? LIMIT 1"
-
+	fmt.Println(emailOrNickname)
 	var user server.User
 	err := db.QueryRow(query, emailOrNickname, emailOrNickname).Scan(
 		&user.UserID, &user.Username, &user.Password, &user.Email,
