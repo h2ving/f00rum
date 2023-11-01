@@ -140,11 +140,6 @@ header {
     display: flex;
 }
 
-.chat-users {
-    flex: 1;
-    border-right: 1px solid #ccc;
-    overflow-y: auto;
-}
 
 .chat-display {
     flex: 2;
@@ -175,6 +170,11 @@ header {
     overflow-y: auto;
 }
 
+.chat-users div {
+    display: flex;
+    justify-content: space-between;
+}
+
 .chat-users div:not(.selected-user) {
     color: #009882;
     padding: 10px;
@@ -194,6 +194,27 @@ header {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+
+/* Style for online status indicator (blue dot) */
+.online {
+    width: 8px;
+    height: 8px;
+    background-color: #4076e5; /* color for online status */
+    border-radius: 50%; /* Make it a circle */
+    display: inline-block;
+    right: 0; /* Adjust spacing between the indicator and the username */
+}
+
+/* Style for offline status indicator (gray dot) */
+.offline {
+    width: 8px;
+    height: 8px;
+    background-color: #ccc; /* Gray color for offline status */
+    border-radius: 50%; /* Make it a circle */
+    display: inline-block;
+    right: 0;  /* Adjust spacing between the indicator and the username */
+}
+
 
 /* Style for sender messages (on the right) */
 .sender {
@@ -218,5 +239,6 @@ header {
 /* Style for the chat container to make it scrollable */
 .chat-messages {
     max-height: 400px; /* Set a maximum height for the chat messages */
-    overflow-y: auto; /* Enable vertical scrolling for overflow content */
+    overflow-y: auto;
+    word-wrap: anywhere;/* Enable vertical scrolling for overflow content */
 }

@@ -26,7 +26,8 @@ document.body.addEventListener('submit', async function(event) {
 
                 localStorage.setItem('username', data.username);
                 //clearLocalStorage();
-                alert(result.message); // Show success message
+                //alert(result.message); // Show success message
+                history.pushState({ page: 'forum' }, 'Forum', '/forum');
                 // Redirect the user to the forum page
                 router(history.state);
             } else {

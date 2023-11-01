@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"real-time-forum/db"
+	"real-time-forum/server"
 )
 
 func fetchChatHistory(c *Client, recipientID int, page int) {
@@ -58,21 +59,21 @@ func getMessages(senderID, recipientID int, page int) ([]ChatMessage, error) {
 }
 
 func fetchUsers(c *Client) {
-	users, _ := GetUsers() // Assuming GetUsers fetches users from the DB
+	users, _ := GetUsers(c) // Assuming GetUsers fetches users from the DB
 	response := FetchMessage{
 		Action: "update_users",
 		Data:   users,
 	}
-	c.Username = users[c.ID]
+	c.Username = users[c.ID].Username
 	c.Conn.WriteJSON(response)
 }
 
-func GetUsers() (map[int]string, error) {
-	users := make(map[int]string) // Initialize the map
+func GetUsers(c *Client) (map[int]server.User, error) {
+	users := make(map[int]server.User) // Initialize the map
 
 	rows, err := db.Dbase.Query("SELECT userID, username FROM Users")
 	if err != nil {
-		return users, err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -81,11 +82,25 @@ func GetUsers() (map[int]string, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&userID, &username); err != nil {
-			return users, err
+			return nil, err
 		}
-		users[userID] = username // Add to the map
+
+		user := server.User{
+			Username: username,
+			Online:   c.Hub.Clients[getClientByUsername(c.Hub.Clients, username)], // Check if the user is online
+		}
+		users[userID] = user
 	}
 	return users, nil
+}
+
+func getClientByUsername(clients map[*Client]bool, username string) *Client {
+	for client := range clients {
+		if client.Username == username {
+			return client
+		}
+	}
+	return nil // No matching client found
 }
 
 func sendMessage(messageData map[string]interface{}, c *Client) {

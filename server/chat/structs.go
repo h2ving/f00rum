@@ -25,8 +25,6 @@ type Hub struct {
 
 	// Unregister requests from the clients.
 	Unregister chan *Client
-
-	FetchUsers chan *map[int]string
 }
 
 type FetchMessage struct {

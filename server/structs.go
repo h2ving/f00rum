@@ -11,6 +11,7 @@ type User struct {
 	LastName  string
 	Age       int
 	Gender    string
+	Online    bool
 }
 
 type RegistrationData struct {

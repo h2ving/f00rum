@@ -133,11 +133,22 @@ const ChatBox = (function () {
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
         const username = localStorage.getItem('username');
+        let firstUser = true; // Track if it's the first user
+
         Object.entries(users).forEach(([key, user]) => {
-            if (user !== username) {
+            if (user.Username !== username) {
                 const userDiv = document.createElement("div");
-                userDiv.textContent = user;
+                const username = document.createElement("div");
+
+                userDiv.textContent = user.Username;
+                console.log(user.Username, user.Online);
                 userDiv.id = `${key}`;
+
+                if (firstUser) {
+                    userDiv.classList.add("selected-user");
+                    firstUser = false; // Set it to false after the first user
+                    fetchMessages(key);
+                }
                 userDiv.onclick = function () {
                     // Remove highlight from all users
                     document.querySelectorAll(".chat-users div").forEach(div => {
@@ -147,7 +158,17 @@ const ChatBox = (function () {
                     this.classList.add("selected-user");
                     fetchMessages(key);
                 };
-                userListDiv.appendChild(userDiv);
+
+                // Add online status indicator
+                const onlineStatus = document.createElement("span");
+                if (user.Online) {
+                    onlineStatus.classList.add("online");
+                } else{
+                    onlineStatus.classList.add("offline");
+                }
+
+                userDiv.append(onlineStatus);
+                userListDiv.append(userDiv);
             }
         });
     }
