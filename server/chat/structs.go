@@ -25,20 +25,11 @@ type Hub struct {
 
 	// Unregister requests from the clients.
 	Unregister chan *Client
-
-	FetchUsers chan *map[int]string
 }
 
 type FetchMessage struct {
 	Action string      `json:"action"`
 	Data   interface{} `json:"data,omitempty"`
-}
-
-type Message struct {
-	Action    string `json:"action"`
-	Sender    string `json:"sender"`
-	Recipient string `json:"recipient"`
-	Content   string `json:"content"`
 }
 
 type ChatMessage struct {

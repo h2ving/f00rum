@@ -24,9 +24,11 @@ document.body.addEventListener('submit', async function (event) {
 
             // Handle server's response
             if (response.ok) {
-                localStorage.setItem('username', JSON.stringify(data.username));
+
+                localStorage.setItem('username', data.username);
                 //clearLocalStorage();
-                alert(result.message); // Show success message
+                //alert(result.message); // Show success message
+                history.pushState({ page: 'forum' }, 'Forum', '/forum');
                 // Redirect the user to the forum page
                 router(history.state);
             } else {
@@ -46,6 +48,7 @@ document.body.addEventListener('submit', async function (event) {
             data[key] = value;
         });
 
+
         try {
             // Send data to the server
             const response = await fetch('/login', {
@@ -60,7 +63,7 @@ document.body.addEventListener('submit', async function (event) {
 
             // Handle server's response
             if (response.ok) {
-                localStorage.setItem('username', JSON.stringify(data.username));
+                localStorage.setItem('username', data.username);
                 //clearLocalStorage();
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
@@ -116,9 +119,7 @@ function loadForumContent() {
     const header = document.querySelector('header');
     const nameParagraph = document.createElement('p'); // Create a new <p> element
     nameParagraph.id = 'name'; // Set the id attribute
-    //TODO Local Storage Korda
     const username = localStorage.getItem('username');
-    //const username = "Malvo"
     nameParagraph.textContent = username.toString();
     const loggedIn = `
             <a href="#" id="buttonHome" class="button-home">Real-Time Forum</a>
@@ -139,7 +140,7 @@ function loadLoginPage() {
     const login = `
             <a href="/" class="button-home">Real-Time Forum</a>
             <form id="loginForm">
-                <input type="text" name="user" placeholder="Username or Email" required>
+                <input type="text" name="username" placeholder="Username or Email" required>
                 <input type="password" name="password" placeholder="Password" required>
                 <button type="submit">Login</button>
             </form>

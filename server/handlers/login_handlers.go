@@ -14,12 +14,10 @@ import (
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// Parse form data
 	var logData server.LoginData
-
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&logData)
 	if err != nil {
 		http.Error(w, "Error parsing JSON: "+err.Error(), http.StatusBadRequest)
-
 		return
 	}
 
@@ -41,7 +39,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error comparing password: ", err)
 		return
 	}
-
 	// Generate a session token
 	sessionToken := functions.GenerateSessionToken()
 	// Store the session in the database with an expiration time

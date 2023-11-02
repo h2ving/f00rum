@@ -2,6 +2,7 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -63,17 +64,16 @@ func (c *Client) readPump() {
 			sendMessage(messageData, c)
 		case "fetch_chat_history":
 			// Convert the "user" value to an integer
-			userStr, ok := messageData["user"].(string)
-			if !ok {
-				log.Printf("Invalid user format: %v", messageData)
+			userStr, userOK := messageData["user"].(string)
+
+			pageInt, pageOK := messageData["page"].(float64)
+			if !userOK || !pageOK {
+				// Handle the error if any of these conversions fail
+				log.Printf("Invalid or missing parameters: userOK=%v, pageOK=%v, perPageOK=%v", userOK, pageOK)
 				continue
 			}
-			userInt, err := strconv.Atoi(userStr)
-			if err != nil {
-				log.Printf("Error converting user to int: %v", err)
-				continue
-			}
-			fetchChatHistory(c, userInt)
+			userInt, _ := strconv.Atoi(userStr)
+			fetchChatHistory(c, userInt, int(pageInt))
 		default:
 			// Handle other actions as needed
 		}
@@ -135,11 +135,12 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func HandleNewUserWsAlert(newUser server.User, h *Hub) {
+func HandleNewUserWsAlert(newUserID int, h *Hub) {
 	message := map[string]interface{}{
-		"type": "newUser",
-		"data": newUser,
+		"action": "newUser",
+		"data":   newUserID,
 	}
+	fmt.Println(message)
 	jsonData, _ := json.Marshal(message)
 	// Broadcast the message to all connected clients
 	h.Broadcast <- jsonData
