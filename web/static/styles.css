@@ -281,6 +281,55 @@ header {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Categories as Buttons */
+#categories {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#categories div {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#categories div:hover {
+    background-color: #d10000;
+}
+
+/* New styles for the custom threads */
+#threads {
+    margin-top: 20px;
+}
+
+.thread {
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.thread h3 {
+    color: #009882;
+    margin-bottom: 5px;
+}
+
+.thread p {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Style for the selected thread in the list */
+.thread.selected-thread {
+    background-color: #009882;
+    color: #fff;
+}
+
 .forum-container h1 {
     color: #009882;
 }
@@ -294,6 +343,11 @@ header {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#create-thread-button:disabled {
+    background-color: #ccc;
+    color: #666;
 }
 
 #create-thread-button:hover {
@@ -402,6 +456,7 @@ header {
 }
 
 .modal-content {
+    width: 60%;
     background-color: #fff;
     margin: 10% auto;
     padding: 20px;

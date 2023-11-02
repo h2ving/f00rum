@@ -112,7 +112,6 @@ const ChatBox = (function () {
 
     let Key;
 
-
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
         Object.entries(users).forEach(([key, user]) => {
