@@ -2,6 +2,7 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -134,11 +135,12 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func HandleNewUserWsAlert(newUser server.User, h *Hub) {
+func HandleNewUserWsAlert(newUserID int, h *Hub) {
 	message := map[string]interface{}{
-		"type": "newUser",
-		"data": newUser,
+		"action": "newUser",
+		"data":   newUserID,
 	}
+	fmt.Println(message)
 	jsonData, _ := json.Marshal(message)
 	// Broadcast the message to all connected clients
 	h.Broadcast <- jsonData

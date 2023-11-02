@@ -66,6 +66,7 @@ func fetchUsers(c *Client) {
 	}
 	c.Username = users[c.ID].Username
 	c.Conn.WriteJSON(response)
+	HandleNewUserWsAlert(server.UserID, c.Hub)
 }
 
 func GetUsers(c *Client) (map[int]server.User, error) {

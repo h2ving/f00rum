@@ -39,7 +39,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error comparing password: ", err)
 		return
 	}
-
 	// Generate a session token
 	sessionToken := functions.GenerateSessionToken()
 	// Store the session in the database with an expiration time

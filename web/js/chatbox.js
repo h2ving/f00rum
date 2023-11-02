@@ -73,7 +73,6 @@ const ChatBox = (function () {
     let currentPage; // Initialize with the first page
     let chatMessagesDiv;
     let allFetched;
-    let scrollRatio;
     let start = false;
     // Function to handle user selection and load chat history
     function fetchMessages(key) {
@@ -126,23 +125,37 @@ const ChatBox = (function () {
             // Display chat history
             displayUsers(message.data);
         }
+        else if (message.action === "newUser")  {
+            if (message.data != UserID) {
+                changeNewUserStatus(message.data)
+            }
+        }
     }
 
+    function changeNewUserStatus(id) {
+        const user = document.getElementById(`user${id}`);
+        const status = user.querySelector('span')
 
+        //const divElement = document.querySelector(`#user${id} span`);
 
+        status.classList.remove("offline");
+        status.classList.add("online");
+    }
+    let UserID;
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
         const username = localStorage.getItem('username');
         let firstUser = true; // Track if it's the first user
 
         Object.entries(users).forEach(([key, user]) => {
-            if (user.Username !== username) {
+            if (user.Username === username) {
+                UserID = key;
+            } else {
                 const userDiv = document.createElement("div");
                 const username = document.createElement("div");
 
                 userDiv.textContent = user.Username;
-                console.log(user.Username, user.Online);
-                userDiv.id = `${key}`;
+                userDiv.id = `user${key}`;
 
                 if (firstUser) {
                     userDiv.classList.add("selected-user");
