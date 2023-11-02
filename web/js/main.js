@@ -1,6 +1,7 @@
 import ChatBox from "./chatbox.js";
+import ForumFeed from "./forum.js";
 
-document.body.addEventListener('submit', async function(event) {
+document.body.addEventListener('submit', async function (event) {
     if (event.target.id === 'registrationForm') {
         event.preventDefault(); // Prevent default form submission
         // Collect data from the form
@@ -74,8 +75,9 @@ document.body.addEventListener('submit', async function(event) {
             console.error('There was an error:', error);
             alert('Login failed. Please try again.');
         }
-    }});
-document.body.addEventListener('click', async function(event) {
+    }
+});
+document.body.addEventListener('click', async function (event) {
     if (event.target.id === 'buttonHome') {
         event.preventDefault(); // Prevent the default behavior of the anchor tag
         await checkAuthentication(); // Assuming checkAuthentication is a function
@@ -106,7 +108,7 @@ document.body.addEventListener('click', async function(event) {
         document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 });
-window.addEventListener('popstate', function(event) {
+window.addEventListener('popstate', function (event) {
     if (event.state) {
         router(event.state);
     }
@@ -125,6 +127,7 @@ function loadForumContent() {
     `;
     header.innerHTML = loggedIn;
     header.insertBefore(nameParagraph, header.querySelector('#logout'));
+    ForumFeed.init()
     ChatBox.init()
 }
 

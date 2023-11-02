@@ -12,10 +12,11 @@ CREATE TABLE IF NOT EXISTS `Users` (
 CREATE TABLE IF NOT EXISTS `Categories` (
 		`categoryID` INTEGER PRIMARY KEY AUTOINCREMENT,
 		`title` TEXT NOT NULL UNIQUE,
-		`description` TEXT NOT NULL UNIQUE,
+		`description` TEXT NOT NULL,
 		`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Each post is a response within a thread
 CREATE TABLE IF NOT EXISTS `Posts` (
 		`postID` INTEGER PRIMARY KEY AUTOINCREMENT,
 		`userID` INTEGER NOT NULL,
@@ -23,16 +24,21 @@ CREATE TABLE IF NOT EXISTS `Posts` (
 		`content` TEXT NOT NULL,
 		`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
         `categoryID` TEXT NOT NULL,
+		`Likes` INTEGER DEFAULT 0,
+    	`Dislikes` INTEGER DEFAULT 0,
 		FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
 		FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE CASCADE
 );
 
+-- Comments on a post
 CREATE TABLE IF NOT EXISTS `Comments` (
     `commentID` INTEGER PRIMARY KEY AUTOINCREMENT,
 	`userID` INTEGER NOT NULL,
 	`postID` INTEGER NOT NULL,
 	`content` TEXT NOT NULL,
 	`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+	`Likes` INTEGER DEFAULT 0,
+    `Dislikes` INTEGER DEFAULT 0,
 	FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
 	FOREIGN KEY (postID) REFERENCES Posts(postID) ON DELETE CASCADE
 );
@@ -55,5 +61,24 @@ CREATE TABLE IF NOT EXISTS `Sessions` (
     FOREIGN KEY(userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
 
+-- Each thread is a forum discussion
+CREATE TABLE IF NOT EXISTS `Threads` (
+    `threadID` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `title` TEXT NOT NULL,
+    `content` TEXT NOT NULL,
+    `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `categoryID` INTEGER NOT NULL,
+    `userID` INTEGER NOT NULL,
+    FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE CASCADE,
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
+);
 
+-- Table for likes/dislikes
+CREATE TABLE IF NOT EXISTS `LikesDislikes` (
+    `LikeDislikeID` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `Type` TEXT NOT NULL,
+    `UserID` INTEGER NOT NULL,
+    `PostID` INTEGER,
+    `CommentID` INTEGER
+);
 

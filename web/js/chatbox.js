@@ -136,12 +136,14 @@ const ChatBox = (function () {
         const user = document.getElementById(`user${id}`);
         const status = user.querySelector('span')
 
+
         //const divElement = document.querySelector(`#user${id} span`);
 
         status.classList.remove("offline");
         status.classList.add("online");
     }
     let UserID;
+
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
         const username = localStorage.getItem('username');
