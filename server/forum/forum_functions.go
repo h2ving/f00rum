@@ -208,7 +208,7 @@ func GetCategories() ([]Category, error) {
     var categories []Category
     for rows.Next() {
         var category Category
-        if err := rows.Scan(&category.CategoryID, &category.Title); err != nil {
+        if err := rows.Scan(&category.CategoryID, &category.Title, &category.Description, &category.CreatedAt); err != nil {
             return nil, err
         }
         categories = append(categories, category)

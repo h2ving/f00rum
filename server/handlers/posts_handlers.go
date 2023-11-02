@@ -173,7 +173,7 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	categories, err := forum.GetCategories()
 	if err != nil {
-		fmt.Println("Failed to get categories")
+		fmt.Println("Failed to get categories: ", err)
 		return
 	}
 

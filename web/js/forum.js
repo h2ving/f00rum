@@ -10,15 +10,16 @@ function initForumPage() {
 
 // Load the forum content
 function loadForumContent() {
-    const container = document.querySelector('.container');
+    const container = document.querySelector('.feedContainer');
     container.innerHTML = `
         <div id="forum" class="forum-container">
-            <h1>Forum</h1>
             <button id="create-thread-button">Create New Thread</button>
+            <div id="categories">
+                <!-- Dynamically populated list of categories -->
+            </div>
             <div id="threads" class="threads">
                 <!-- Dynamically populated list of threads will appear here -->
-            </div>
-            <div id="threadDetails" class="thread-details">
+                <div id="threadDetails" class="thread-details">
                 <h2>Thread Title</h2>
                 <div id="posts" class="posts">
                     <!-- Dynamically populated list of posts will appear here -->
@@ -28,6 +29,8 @@ function loadForumContent() {
                     <button type="submit">Post</button>
                 </form>
             </div>
+            </div>
+            
         </div>
         <div id="createThreadModal" class="modal" >
             <div class="modal-content">
@@ -102,6 +105,18 @@ function fetchThreads() {
         .catch(error => {
             console.error('Error fetching threads:', error);
         });
+}
+
+//UNUSED FOR FUTURE SELECTION
+function fetchThreadsWithCategoryID(categoryID) {
+    fetch(`/api/threads?categoryID=` + categoryID)
+        .then(response => response.json())
+        .then(data => {
+            displayThreads(data);
+        })
+        .catch(error => {
+            console.error('Error fetching threads by categoryID: ' + categoryID + 'ERROR: ', error)
+        })
 }
 
 // Display the list of threads
