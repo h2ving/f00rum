@@ -27,6 +27,11 @@ func main() {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		chat.ServeWs(hub, w, r)
 	})
+
+	// endpoints for forum part
+	mux.HandleFunc("/api/categories", handlers.GetCategoriesHandler).Methods("GET")
+	mux.HandleFunc("/api/threads", handlers.GetThreadsByCategoryHandler).Methods("GET")
+
 	// Catch-all route to serve index.html for all other routes
 	mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/static/index.html")

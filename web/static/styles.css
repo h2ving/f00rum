@@ -51,7 +51,8 @@ header {
 
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between form elements */
+    gap: 10px;
+    /* Space between form elements */
 }
 
 #loginForm input[type="text"],
@@ -61,7 +62,8 @@ header {
     border-radius: 3px;
 }
 
-#loginForm button, #logout {
+#loginForm button,
+#logout {
     padding: 10px 20px;
     background-color: #00665a;
     color: #eaeaea;
@@ -71,7 +73,8 @@ header {
     transition: background-color 0.3s;
 }
 
-#loginForm button:hover, #logout:hover {
+#loginForm button:hover,
+#logout:hover {
     background-color: #004d4a;
 }
 
@@ -87,16 +90,23 @@ header {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
-    box-sizing: border-box; /* This ensures padding and border are included in the total width */
+    box-sizing: border-box;
+    /* This ensures padding and border are included in the total width */
 
 }
+
 #registrationForm input {
-    color: #0a1f1f; /* Primary Text color for input text */
-    border-color: #909090; /* Secondary Text color for input border */
+    color: #0a1f1f;
+    /* Primary Text color for input text */
+    border-color: #909090;
+    /* Secondary Text color for input border */
 }
+
 #registrationForm input::placeholder {
-    color: #909090; /* Secondary Text color for placeholder text */
+    color: #909090;
+    /* Secondary Text color for placeholder text */
 }
+
 /* Gender dropdown styling */
 #registrationForm select {
     width: 100%;
@@ -104,22 +114,31 @@ header {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
-    box-sizing: border-box; /* This ensures padding and border are included in the total width */
-    color: #0a1f1f; /* Primary Text color for dropdown text */
-    border-color: #909090; /* Secondary Text color for dropdown border */
-    appearance: none; /* Removes default browser styling */
-    background-color: #eaeaea; /* Light background for dropdown */
-    cursor: crosshair; /* Hand cursor for dropdown */
+    box-sizing: border-box;
+    /* This ensures padding and border are included in the total width */
+    color: #0a1f1f;
+    /* Primary Text color for dropdown text */
+    border-color: #909090;
+    /* Secondary Text color for dropdown border */
+    appearance: none;
+    /* Removes default browser styling */
+    background-color: #eaeaea;
+    /* Light background for dropdown */
+    cursor: crosshair;
+    /* Hand cursor for dropdown */
 }
 
 #registrationForm select:focus {
-    outline: none; /* Removes default browser focus outline */
-    border-color: #009882; /* Accent color for focused dropdown border */
+    outline: none;
+    /* Removes default browser focus outline */
+    border-color: #009882;
+    /* Accent color for focused dropdown border */
 }
 
 
 #registrationForm button {
-    background-color: #009882; /* Accent Color */
+    background-color: #009882;
+    /* Accent Color */
     color: #e0e0e0;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -164,7 +183,7 @@ header {
     flex: none;
 }
 
-#sendButton{
+#sendButton {
     margin: 10px;
     padding: 5px 10px;
 }
@@ -183,13 +202,17 @@ header {
 }
 
 .chat-users div:not(.selected-user):hover {
-    background-color: #e0e0e0; /* Change the background color on hover */
+    background-color: #e0e0e0;
+    /* Change the background color on hover */
 }
 
 /* Define the CSS for the selected user element */
 .selected-user {
-    background-color: #749a9a;; /* Set the background color to a blue shade (you can change this color) */
-    color: #fff; /* Set the text color to white (you can change this color) */
+    background-color: #749a9a;
+    ;
+    /* Set the background color to a blue shade (you can change this color) */
+    color: #fff;
+    /* Set the text color to white (you can change this color) */
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -198,25 +221,309 @@ header {
 /* Style for sender messages (on the right) */
 .sender {
     margin-top: 5px;
-    background-color: #71c084; /* Set the background color for sender messages */
-    color: white; /* Set the text color for sender messages */
-    float: right; /* Align sender messages to the right */
-    clear: both; /* Ensure sender messages do not overlap with previous elements */
-    padding: 10px; /* Add some padding to sender messages */
+    background-color: #71c084;
+    /* Set the background color for sender messages */
+    color: white;
+    /* Set the text color for sender messages */
+    float: right;
+    /* Align sender messages to the right */
+    clear: both;
+    /* Ensure sender messages do not overlap with previous elements */
+    padding: 10px;
+    /* Add some padding to sender messages */
 }
 
 /* Style for recipient messages (on the left) */
 .recipient {
     margin-top: 5px;
-    background-color: #009882; /* Set the background color for recipient messages */
-    color: white; /* Set the text color for recipient messages */
-    float: left; /* Align recipient messages to the left */
-    clear: both; /* Ensure recipient messages do not overlap with previous elements */
-    padding: 10px; /* Add some padding to recipient messages */
+    background-color: #009882;
+    /* Set the background color for recipient messages */
+    color: white;
+    /* Set the text color for recipient messages */
+    float: left;
+    /* Align recipient messages to the left */
+    clear: both;
+    /* Ensure recipient messages do not overlap with previous elements */
+    padding: 10px;
+    /* Add some padding to recipient messages */
 }
 
 /* Style for the chat container to make it scrollable */
 .chat-messages {
-    max-height: 400px; /* Set a maximum height for the chat messages */
-    overflow-y: auto; /* Enable vertical scrolling for overflow content */
+    max-height: 400px;
+    /* Set a maximum height for the chat messages */
+    overflow-y: auto;
+    /* Enable vertical scrolling for overflow content */
+}
+
+.create-thread-button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.create-thread-button:hover {
+    background-color: #2d8b88;
+}
+
+/* Forum Page Styles */
+.forum-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Categories as Buttons */
+#categories {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#categories div {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#categories div:hover {
+    background-color: #d10000;
+}
+
+/* New styles for the custom threads */
+#threads {
+    margin-top: 20px;
+}
+
+.thread {
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.thread h3 {
+    color: #009882;
+    margin-bottom: 5px;
+}
+
+.thread p {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Style for the selected thread in the list */
+.thread.selected-thread {
+    background-color: #009882;
+    color: #fff;
+}
+
+.forum-container h1 {
+    color: #009882;
+}
+
+#create-thread-button {
+    display: block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#create-thread-button:disabled {
+    background-color: #ccc;
+    color: #666;
+}
+
+#create-thread-button:hover {
+    background-color: #2d8b88;
+}
+
+/* Thread List Styles */
+.threads {
+    /* Add styles for the list of threads here */
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.threads .thread {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+/* Style for the selected thread in the list */
+.threads .thread.selected-thread {
+    background-color: #009882;
+    color: #fff;
+}
+
+/* Thread Details Styles */
+.thread-details {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.thread-details h2 {
+    /* Add styles for the thread title here */
+    color: #009882;
+}
+
+/* Post List Styles */
+.posts {
+    /* Add styles for the list of posts here */
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+/* Style for individual posts in the list */
+.posts .post {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+/* Create Post Form Styles */
+#createPostForm {
+    margin-top: 20px;
+}
+
+/* Style for the post input text field */
+#createPostForm input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: #0a1f1f;
+    border-color: #909090;
+}
+
+/* Style for the post submit button */
+#createPostForm button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #009882;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect for the post submit button */
+#createPostForm button[type="submit"]:hover {
+    background-color: #00665a;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    width: 60%;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #000;
+}
+
+/* Styles for Modal Form Elements */
+#modalForm label {
+    font-weight: bold;
+}
+
+#modalTitle,
+#modalContent {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: #0a1f1f;
+    border-color: #909090;
+}
+
+#modalContent {
+    height: 100px;
+    /* Adjust the height as needed */
+}
+
+#modalCategory {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: #0a1f1f;
+    border-color: #909090;
+    appearance: none;
+    background-color: #eaeaea;
+    cursor: crosshair;
+}
+
+#modalCategory:focus {
+    outline: none;
+    border-color: #009882;
+}
+
+#submitModalButton {
+    background-color: #009882;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#submitModalButton:hover {
+    background-color: #00665a;
 }
