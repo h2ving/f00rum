@@ -548,3 +548,91 @@ header {
 #submitModalButton:hover {
     background-color: #00665a;
 }
+
+/* Style for the overlay when content is open */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* Style for the thread content modal */
+.thread-content-modal {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+    /* Adjust the width as needed */
+    margin: 0 auto;
+    position: relative;
+    /* To make sure the Close button is positioned correctly */
+}
+
+.thread-content-modal h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #009882;
+    /* Adjusted color */
+    margin-bottom: 10px;
+}
+
+.thread-content-modal p {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.thread-content-modal .comment-list {
+    list-style: none;
+    padding: 0;
+}
+
+.thread-content-modal .comment-item {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.thread-content-modal .comment-item p {
+    margin: 0;
+}
+
+/* Voting buttons */
+.thread-content-modal .vote-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.thread-content-modal .vote-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.thread-content-modal .vote-buttons button:hover {
+    background-color: #00665a;
+}
+
+.thread-content-modal .upvote {
+    background-color: #009882;
+    color: #e0e0e0;
+}
+
+.thread-content-modal .downvote {
+    background-color: #d10000;
+    color: #e0e0e0;
+}

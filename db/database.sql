@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `Categories` (
 );
 
 -- Each post is a response within a thread
+-- If you were to implement replies to a thread comment/reply then this should 
+-- be implemented as reply to a thread
 CREATE TABLE IF NOT EXISTS `Posts` (
 		`postID` INTEGER PRIMARY KEY AUTOINCREMENT,
 		`userID` INTEGER NOT NULL,
@@ -34,13 +36,13 @@ CREATE TABLE IF NOT EXISTS `Posts` (
 CREATE TABLE IF NOT EXISTS `Comments` (
     `commentID` INTEGER PRIMARY KEY AUTOINCREMENT,
 	`userID` INTEGER NOT NULL,
-	`postID` INTEGER NOT NULL,
+	`threadID` INTEGER NOT NULL,
 	`content` TEXT NOT NULL,
 	`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
 	`Likes` INTEGER DEFAULT 0,
     `Dislikes` INTEGER DEFAULT 0,
 	FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
-	FOREIGN KEY (postID) REFERENCES Posts(postID) ON DELETE CASCADE
+	FOREIGN KEY (threadID) REFERENCES Threads(threadID) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS 'ChatMessages' (
@@ -81,4 +83,3 @@ CREATE TABLE IF NOT EXISTS `LikesDislikes` (
     `PostID` INTEGER,
     `CommentID` INTEGER
 );
-

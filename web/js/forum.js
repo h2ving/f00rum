@@ -1,3 +1,4 @@
+import { UserID } from './chatbox.js';
 
 const ForumFeed = (function () {
     var stateCategorySelector = false;
@@ -46,6 +47,8 @@ const ForumFeed = (function () {
         // Event listener for the create thread modal's close button
         const closeModalButton = document.getElementById('closeModalButton');
 
+        const submitModalButton = document.getElementById('submitModalButton');
+
         categoriesDiv.addEventListener('click', (event) => {
             if (event.target.tagName === 'DIV') {
                 const categoryID = event.target.dataset.categoryID;
@@ -64,10 +67,10 @@ const ForumFeed = (function () {
         });
         
         // Create new thread modal window submit button
-        const submitModalButton = document.getElementById('submitModalButton');
         submitModalButton.addEventListener('click', () => {
             submitNewThread();
         });
+
     }
 
     // Function to show the create thread modal
@@ -88,14 +91,17 @@ const ForumFeed = (function () {
     async function submitNewThread() {
         const title = document.getElementById('modalTitle').value;
         const content = document.getElementById('modalContent').value;
-        const categoryID = document.getElementById('modalCategory').value;
+        let categoryID = document.getElementById('modalCategory').value;
+        categoryID = parseInt(categoryID);
+        let UserIDInt = parseInt(UserID)
 
         const newThread = {
-            title,
-            content,
-            categoryID,
-            userID: 1, // TODO: Replace with the actual user ID
+            title: title,
+            content: content,
+            categoryID: categoryID,
+            userID: UserIDInt, 
         };
+        console.log(newThread)
 
         try {
             const response = await fetch('/api/threads', {
@@ -171,6 +177,22 @@ const ForumFeed = (function () {
         }
     }
 
+    async function fetchComments(threadID) {
+        try {
+            const response = await fetch(`/api/comments?threadID=${threadID}`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            console.log(data)
+            return data; //Return the fetched comments
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            // TODO: handle error
+        }
+    }
+
     function displayCategories(categories) {
         const categoriesDiv = document.getElementById('categories');
 
@@ -200,9 +222,9 @@ const ForumFeed = (function () {
             const contentElement = document.createElement('p');
             contentElement.textContent = thread.content;
             threadElement.appendChild(contentElement);
-
+            console.log(thread.threadID)
             // Additional data attributes if needed
-            threadElement.dataset.ThreadID = thread.ThreadID;
+            threadElement.setAttribute('id', thread.threadID);
             // Add other data attributes as required
 
             // Append the custom thread element to the threads container
@@ -214,9 +236,61 @@ const ForumFeed = (function () {
                 // For example, displaying the full content or opening the thread
                 console.log('Thread ID:', thread.threadID);
                 console.log('Full Content:', thread.content);
+                displayThreadContent(thread);
             });
         });
     }
+
+    async function displayThreadContent(thread) {
+
+        const overlay = document.createElement('div');
+        overlay.classList.add('overlay');
+        
+        const threadContentModal = document.createElement('div');
+        threadContentModal.classList.add('thread-content-modal');
+    
+        // Title
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = thread.title;
+        threadContentModal.appendChild(titleElement);
+    
+        // Content
+        const contentElement = document.createElement('p');
+        contentElement.textContent = thread.content;
+        threadContentModal.appendChild(contentElement);
+
+        //Comments
+        const comments = await fetchComments(thread.threadID);
+        //List of comments
+        if (comments && comments.length > 0) {
+            const commentsList = document.createElement('ul');
+            comments.forEach(comment => {
+                const commentListItem = document.createElement('li');
+                commentListItem.textContent = comment.content;
+                commentsList.appendChild(commentListItem);
+            });
+            threadContentModal.appendChild(commentsList);
+        }
+
+        // Close button
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.addEventListener('click', () => {
+            // Close the modal and overlay
+            threadContentModal.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+        threadContentModal.appendChild(closeButton);
+        overlay.appendChild(threadContentModal);
+        // Append the modal and overlay to the body
+        const feedContainer = document.querySelector('.feedContainer');
+        feedContainer.appendChild(overlay);
+        
+        // Show the overlay and modal
+        overlay.style.display = 'block';
+    }
+    
+    
 
     //Public methods
     return {

@@ -1,5 +1,5 @@
 
-
+let UserID;
 // Wrap your code in a module for better encapsulation
 const ChatBox = (function () {
     let socket;
@@ -142,7 +142,6 @@ const ChatBox = (function () {
         status.classList.remove("offline");
         status.classList.add("online");
     }
-    let UserID;
 
     function displayUsers(users) {
         const userListDiv = document.querySelector(".chat-users");
@@ -187,6 +186,8 @@ const ChatBox = (function () {
             }
         });
     }
+
+    
 
     // Function to display a message in the chat
     function displayMessage(message) {
@@ -247,3 +248,5 @@ const ChatBox = (function () {
 })();
 
 export default ChatBox;
+console.log(UserID)
+export {UserID};

@@ -31,13 +31,13 @@ type Post struct {
 }
 
 type Comment struct {
-    CommentID    int    `json:"commentID"`
-    Content      string `json:"content"`
-    CreatedAt    time.Time `json:"createdAt"`
-    UserID       int `json:"userID"`
-    PostID       int `json:"postID"`
-    Likes        int `json:"likes"`
-    Dislikes     int `json:"dislikes"`
+    CommentID int       `json:"commentID"`
+    UserID    int       `json:"userID"`
+    ThreadID  int       `json:"threadID"`
+    Content   string    `json:"content"`
+    CreatedAt time.Time `json:"createdAt"`
+    Likes     int       `json:"likes"`
+    Dislikes  int       `json:"dislikes"`
 }
 
 type LikeDislike struct {

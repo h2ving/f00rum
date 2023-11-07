@@ -31,6 +31,8 @@ func main() {
 	// endpoints for forum part
 	mux.HandleFunc("/api/categories", handlers.GetCategoriesHandler).Methods("GET")
 	mux.HandleFunc("/api/threads", handlers.GetThreadsByCategoryHandler).Methods("GET")
+	mux.HandleFunc("/api/threads", handlers.CreateThreadsHandler).Methods("POST")
+	mux.HandleFunc("/api/comments", handlers.GetComments).Methods("GET")
 
 	// Catch-all route to serve index.html for all other routes
 	mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
