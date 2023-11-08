@@ -16,18 +16,8 @@ type Thread struct {
     CreatedAt    time.Time `json:"createdAt"`
     CategoryID   int `json:"categoryID"`
     UserID       int `json:"userID"`
-    Likes        int `json:"likes"`
-    Dislikes     int `json:"dislikes"`
-}
-
-type Post struct {
-    PostID       int    `json:"postID"`
-    Content      string `json:"content"`
-    CreatedAt    time.Time `json:"createdAt"`
-    UserID       int `json:"userID"`
-    ThreadID     int `json:"threadID"`
-    Likes        int `json:"likes"`
-    Dislikes     int `json:"dislikes"`
+    Upvotes        int `json:"upvotes"`
+    Downvotes     int `json:"downvotes"`
 }
 
 type Comment struct {
@@ -36,14 +26,14 @@ type Comment struct {
     ThreadID  int       `json:"threadID"`
     Content   string    `json:"content"`
     CreatedAt time.Time `json:"createdAt"`
-    Likes     int       `json:"likes"`
-    Dislikes  int       `json:"dislikes"`
+    Upvotes     int       `json:"upvotes"`
+    Downvotes  int       `json:"downvotes"`
 }
 
-type LikeDislike struct {
-    LikeDislikeID int    `json:"likeDislikeID"`
-    Type           string `json:"type"` // 'like' or 'dislike'
-    UserID         int `json:"userID"`
-    PostID         int `json:"postID"`
-    CommentID      int `json:"commentID"`
+type Vote struct {
+    VoteID    int    `json:"voteID"`
+    Type      string `json:"type"` // 'like' or 'dislike'
+    UserID    int `json:"userID"`
+    ThreadID  int `json:"threadID"`
+    CommentID int `json:"commentID"`
 }

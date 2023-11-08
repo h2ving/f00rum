@@ -65,7 +65,7 @@ const ForumFeed = (function () {
         closeModalButton.addEventListener('click', () => {
             hideCreateThreadModal();
         });
-        
+
         // Create new thread modal window submit button
         submitModalButton.addEventListener('click', () => {
             submitNewThread();
@@ -99,7 +99,7 @@ const ForumFeed = (function () {
             title: title,
             content: content,
             categoryID: categoryID,
-            userID: UserIDInt, 
+            userID: UserIDInt,
         };
         console.log(newThread)
 
@@ -242,31 +242,58 @@ const ForumFeed = (function () {
     }
 
     async function displayThreadContent(thread) {
+        votes = fetchVotes(thread.threadID)
 
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
-        
+
         const threadContentModal = document.createElement('div');
         threadContentModal.classList.add('thread-content-modal');
-    
+
         // Title
         const titleElement = document.createElement('h3');
         titleElement.textContent = thread.title;
         threadContentModal.appendChild(titleElement);
-    
+
         // Content
         const contentElement = document.createElement('p');
         contentElement.textContent = thread.content;
         threadContentModal.appendChild(contentElement);
 
-        //Comments
         const comments = await fetchComments(thread.threadID);
-        //List of comments
         if (comments && comments.length > 0) {
             const commentsList = document.createElement('ul');
+            commentsList.classList.add('comment-list');
             comments.forEach(comment => {
                 const commentListItem = document.createElement('li');
-                commentListItem.textContent = comment.content;
+                commentListItem.classList.add('comment-item');
+
+                const commentContent = document.createElement('p');
+                commentContent.textContent = comment.content;
+                commentListItem.appendChild(commentContent);
+
+                console.log(votes)
+
+                /// Like Button
+                const likeButton = document.createElement('button');
+                likeButton.innerHTML = '<span>&uarr;</span> <span class="like-count">' + comment.Upvotes + '</span>';
+                likeButton.classList.add('like-button');
+                likeButton.addEventListener('click', async () => {
+                    const updatedLikes = await handleVote(comment.commentID, 'upvote');
+                    likeButton.querySelector('.like-count').textContent = updatedLikes;
+                });
+                commentListItem.appendChild(likeButton);
+
+                // Dislike Button
+                const dislikeButton = document.createElement('button');
+                dislikeButton.innerHTML = '<span>&darr;</span> <span class="dislike-count">' + comment.Downvotes + '</span>';
+                dislikeButton.classList.add('dislike-button');
+                dislikeButton.addEventListener('click', async () => {
+                    const updatedDislikes = await handleVote(comment.commentID, 'downvote');
+                    dislikeButton.querySelector('.dislike-count').textContent = updatedDislikes;
+                });
+                commentListItem.appendChild(dislikeButton);
+
                 commentsList.appendChild(commentListItem);
             });
             threadContentModal.appendChild(commentsList);
@@ -285,12 +312,52 @@ const ForumFeed = (function () {
         // Append the modal and overlay to the body
         const feedContainer = document.querySelector('.feedContainer');
         feedContainer.appendChild(overlay);
-        
+
         // Show the overlay and modal
         overlay.style.display = 'block';
     }
-    
-    
+
+    // Function to handle upvote or downvote
+    async function handleVote(commentID, action) {
+        let UserIDInt = parseInt(UserID);
+        try {
+            const response = await fetch('/api/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ commentID, action, UserIDInt }),
+            });
+
+            if (response.ok) {
+                const updatedComment = await response.json();
+
+                return action === 'upvote' ? updatedComment.Upvotes : updatedComment.Downvotes;
+            } else {
+                console.error('Failed to update the upvote/downvote');
+                return undefined; // or any default value you want to handle the error
+            }
+        } catch (error) {
+            console.error('Error handling the upvote/downvote action:', error);
+        }
+    }
+
+    async function fetchVotes(threadID) {
+        try {
+            const response = await fetch(`/api/votes?threadID=${threadID}`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            console.log(data)
+            return data; //Return the fetched votes
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            // TODO: handle error
+        }
+    }
+
 
     //Public methods
     return {

@@ -636,3 +636,53 @@ header {
     background-color: #d10000;
     color: #e0e0e0;
 }
+
+/* COMMENTS */
+.comment-list {
+    list-style: none;
+    padding: 0;
+}
+
+.comment-item {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    position: relative;
+}
+
+.comment-text {
+    align-self: flex-start;
+    /* Align the comment text to the left */
+    margin: 0;
+    /* Remove default margin for <p> */
+    padding: 0;
+    /* Remove default padding for <p> */
+}
+
+.like-button,
+.dislike-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.like-button>span,
+.dislike-button>span {
+    display: inline-block;
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.like-button>span::after,
+.dislike-button>span::after {
+    content: attr(data-count);
+    margin-left: 3px;
+    font-size: 14px;
+}
