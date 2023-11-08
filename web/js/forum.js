@@ -242,8 +242,9 @@ const ForumFeed = (function () {
     }
 
     async function displayThreadContent(thread) {
+        //Votes
         votes = fetchVotes(thread.threadID)
-
+        //Overlay modal
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
 

@@ -133,8 +133,8 @@ func VoteHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     response := map[string]interface{}{
-        "Likes": likecount,
-		"Dislikes": dislikecount,
+        "Upvotes": upvoteCount,
+		"Downvotes": downvoteCount,
     }
 
     w.Header().Set("Content-Type", "application/json")
@@ -151,7 +151,7 @@ func GetVotesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error converting threadID to int", http.StatusInternalServerError)
 	}
-	votes, err := forum.GetVotes(threadIDInt)
+	votes, err := forum.GetCommentVotes(threadIDInt)
 	if err != nil {
 		fmt.Println("Failed to fetch votes", http.StatusInternalServerError)
 	}

@@ -143,7 +143,7 @@ func Downvote(commentID, userID int) (int, error) {
 }
 
 // GetVotes retrieves all votes related to a specific threadID through comments
-func GetVotes(threadID int) ([]Vote, error) {
+func GetCommentVotes(threadID int) ([]Vote, error) {
     query := `SELECT l.voteID, l.type, l.userID, l.threadID, l.commentID 
               FROM Votes l
               INNER JOIN Comments c ON l.commentID = c.commentID 
