@@ -76,6 +76,7 @@ const ChatBox = (function () {
     let start = false;
     // Function to handle user selection and load chat history
     function fetchMessages(key) {
+        console.log("THIS IS FETCH", key)
         // Clear the chat-messages div
         chatMessagesDiv = document.querySelector(".chat-messages");
         if (selectedUser !== key) {
@@ -117,22 +118,74 @@ const ChatBox = (function () {
     function handleIncomingMessage(event) {
         const message = JSON.parse(event.data);
         if (message.action === "send_message") {
-            displayMessage(message);
+            console.log("sender: ", message["sender"])
+            console.log("selectedUser", selectedUser)
+            if (message["sender"] != selectedUser){
+                handleNewMessageNotification(message["sender"]);
+                console.log("yo")
+            }else {
+                displayMessage(message);
+            }
         } else if (message.action === "chat_history") {
             // Display chat history
             displayChatHistory(message.content);
         } else if (message.action === "update_users") {
             // Display chat history
             displayUsers(message.data);
-        }
-        else if (message.action === "newUser")  {
+        } else if (message.action === "newUser")  {
             if (message.data != UserID) {
-                changeNewUserStatus(message.data)
+                NewUserStatus(message.data)
+            }
+        } else if (message.action === "disconnectUser")  {
+            if (message.data != UserID) {
+                DisconnectedUserStatus(message.data)
             }
         }
     }
 
-    function changeNewUserStatus(id) {
+    let isBlinking = false;
+
+    function handleNewMessageNotification(user) {
+        if (!isBlinking) {
+            isBlinking = true;
+            const userDiv = document.querySelector(`#user${user}`);
+            const statusSpan = userDiv.querySelector("span");
+
+            const originalStatusClass = statusSpan.className;
+            let isBlinkOn = false;
+
+            const blinkInterval = setInterval(() => {
+                if (isBlinkOn) {
+                    statusSpan.classList.remove("blink");
+                    isBlinkOn = false;
+                } else {
+                    statusSpan.classList.add("blink");
+                    isBlinkOn = true;
+                }
+            }, 500);
+
+            // Stop blinking after the user clicks on the user div
+            userDiv.onclick = function () {
+                clearInterval(blinkInterval);
+                statusSpan.className = originalStatusClass; // Restore the original status class
+                isBlinking = false;
+
+                document.querySelectorAll(".chat-users div").forEach(div => {
+                    div.classList.remove("selected-user");
+                });
+                // this.classList.remove('new-message')
+                // Highlight the clicked user
+                this.classList.add("selected-user");
+                const match = userDiv.id.match(/(\d+)/);
+                const userID = parseInt(match[0], 10)
+                console.log("Selected user", match[0])
+                fetchMessages(match[0]);
+            };
+        }
+    }
+
+
+    function NewUserStatus(id) {
         const user = document.getElementById(`user${id}`);
         const status = user.querySelector('span')
 
@@ -141,6 +194,17 @@ const ChatBox = (function () {
 
         status.classList.remove("offline");
         status.classList.add("online");
+    }
+
+    function DisconnectedUserStatus(id) {
+        const user = document.getElementById(`user${id}`);
+        const status = user.querySelector('span')
+
+
+        //const divElement = document.querySelector(`#user${id} span`);
+
+        status.classList.remove("online");
+        status.classList.add("offline");
     }
 
     function displayUsers(users) {
@@ -168,6 +232,7 @@ const ChatBox = (function () {
                     document.querySelectorAll(".chat-users div").forEach(div => {
                         div.classList.remove("selected-user");
                     });
+                    //this.classList.remove('new-message')
                     // Highlight the clicked user
                     this.classList.add("selected-user");
                     fetchMessages(key);

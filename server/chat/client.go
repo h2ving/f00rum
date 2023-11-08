@@ -10,10 +10,7 @@ import (
 	"strconv"
 )
 
-var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
-)
+var newline = []byte{'\n'}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -27,6 +24,7 @@ var upgrader = websocket.Upgrader{
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
+		DisconnectedUserWsAlert(c.ID, c.Hub)
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 		log.Println(c.Username, " disconnected")
@@ -135,9 +133,20 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func HandleNewUserWsAlert(newUserID int, h *Hub) {
+func NewUserWsAlert(newUserID int, h *Hub) {
 	message := map[string]interface{}{
 		"action": "newUser",
+		"data":   newUserID,
+	}
+	fmt.Println(message)
+	jsonData, _ := json.Marshal(message)
+	// Broadcast the message to all connected clients
+	h.Broadcast <- jsonData
+}
+
+func DisconnectedUserWsAlert(newUserID int, h *Hub) {
+	message := map[string]interface{}{
+		"action": "disconnectUser",
 		"data":   newUserID,
 	}
 	fmt.Println(message)

@@ -636,3 +636,19 @@ header {
     background-color: #d10000;
     color: #e0e0e0;
 }
+
+/* Add this CSS style to your stylesheet */
+/* Add this CSS style to your stylesheet */
+.blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: orange;
+    }
+    50% {
+        background-color: red;
+    }
+
+}

@@ -66,7 +66,7 @@ func fetchUsers(c *Client) {
 	}
 	c.Username = users[c.ID].Username
 	c.Conn.WriteJSON(response)
-	HandleNewUserWsAlert(server.UserID, c.Hub)
+	NewUserWsAlert(server.UserID, c.Hub)
 }
 
 func GetUsers(c *Client) (map[int]server.User, error) {
@@ -113,6 +113,7 @@ func sendMessage(messageData map[string]interface{}, c *Client) {
 		fmt.Println("client nil")
 	}
 	var recipient *Client
+	messageData["sender"] = c.ID
 	for key, value := range c.Hub.Clients {
 		if key.Username == messageData["recipient"] {
 			recipient = key
