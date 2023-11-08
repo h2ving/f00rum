@@ -1,3 +1,5 @@
+-- what is the meaning of life
+
 CREATE TABLE IF NOT EXISTS `Users` (
 		`userID` INTEGER PRIMARY KEY AUTOINCREMENT,
 		`username` TEXT NOT NULL UNIQUE,
@@ -16,31 +18,15 @@ CREATE TABLE IF NOT EXISTS `Categories` (
 		`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Each post is a response within a thread
--- If you were to implement replies to a thread comment/reply then this should 
--- be implemented as reply to a thread
-CREATE TABLE IF NOT EXISTS `Posts` (
-		`postID` INTEGER PRIMARY KEY AUTOINCREMENT,
-		`userID` INTEGER NOT NULL,
-		`title` TEXT NOT NULL,
-		`content` TEXT NOT NULL,
-		`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
-        `categoryID` TEXT NOT NULL,
-		`Likes` INTEGER DEFAULT 0,
-    	`Dislikes` INTEGER DEFAULT 0,
-		FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
-		FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE CASCADE
-);
-
--- Comments on a post
+-- Comments on a thread
 CREATE TABLE IF NOT EXISTS `Comments` (
     `commentID` INTEGER PRIMARY KEY AUTOINCREMENT,
 	`userID` INTEGER NOT NULL,
 	`threadID` INTEGER NOT NULL,
 	`content` TEXT NOT NULL,
 	`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
-	`Likes` INTEGER DEFAULT 0,
-    `Dislikes` INTEGER DEFAULT 0,
+	`upvotes` INTEGER DEFAULT 0,
+    `downvotes` INTEGER DEFAULT 0,
 	FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
 	FOREIGN KEY (threadID) REFERENCES Threads(threadID) ON DELETE CASCADE
 );
@@ -71,15 +57,20 @@ CREATE TABLE IF NOT EXISTS `Threads` (
     `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `categoryID` INTEGER NOT NULL,
     `userID` INTEGER NOT NULL,
+    `upvotes` INTEGER DEFAULT 0,
+    `downvotes` INTEGER DEFAULT 0,
     FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE CASCADE,
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
 
 -- Table for likes/dislikes
-CREATE TABLE IF NOT EXISTS `LikesDislikes` (
-    `LikeDislikeID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Type` TEXT NOT NULL,
-    `UserID` INTEGER NOT NULL,
-    `PostID` INTEGER,
-    `CommentID` INTEGER
+CREATE TABLE IF NOT EXISTS `Votes` (
+    `voteID` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `type` TEXT NOT NULL,
+    `userID` INTEGER NOT NULL,
+    `threadID` INTEGER,
+    `commentID` INTEGER,
+    FOREIGN KEY (commentID) REFERENCES Comments(commentID) ON DELETE CASCADE,
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (threadID) REFERENCES Threads(threadID) ON DELETE CASCADE
 );

@@ -33,6 +33,8 @@ func main() {
 	mux.HandleFunc("/api/threads", handlers.GetThreadsByCategoryHandler).Methods("GET")
 	mux.HandleFunc("/api/threads", handlers.CreateThreadsHandler).Methods("POST")
 	mux.HandleFunc("/api/comments", handlers.GetComments).Methods("GET")
+	mux.HandleFunc("/api/vote", handlers.VoteHandler).Methods("POST")
+	mux.HandleFunc("/api/votes", handlers.GetVotesHandler).Methods("GET")
 
 	// Catch-all route to serve index.html for all other routes
 	mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
