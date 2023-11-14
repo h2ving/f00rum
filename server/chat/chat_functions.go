@@ -145,6 +145,5 @@ func sendMessage(messageData map[string]interface{}, c *Client) {
 }
 func storeMessage(senderID, recipientID int, message string) error {
 	_, err := db.Dbase.Exec("INSERT INTO ChatMessages (senderID, receiverID, message) VALUES (?, ?, ?)", senderID, recipientID, message)
-	fmt.Println("storeMessage: ", err)
 	return err
 }

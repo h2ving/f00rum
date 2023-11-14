@@ -24,7 +24,10 @@ func StartDB() {
 	if err1 != nil {
 		log.Fatal(err1)
 	}
-
+	// _, err2 := db.Exec(ReadTable("ThreadsPopulate.sql"))
+	// if err2 != nil {
+	// 	log.Fatal(err2)
+	// }
 	Dbase = db
 }
 

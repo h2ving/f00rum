@@ -76,7 +76,6 @@ const ChatBox = (function () {
     let start = false;
     // Function to handle user selection and load chat history
     function fetchMessages(key) {
-        console.log("THIS IS FETCH", key)
         // Clear the chat-messages div
         chatMessagesDiv = document.querySelector(".chat-messages");
         if (selectedUser !== key) {
@@ -118,11 +117,8 @@ const ChatBox = (function () {
     function handleIncomingMessage(event) {
         const message = JSON.parse(event.data);
         if (message.action === "send_message") {
-            console.log("sender: ", message["sender"])
-            console.log("selectedUser", selectedUser)
             if (message["sender"] != selectedUser){
                 handleNewMessageNotification(message["sender"]);
-                console.log("yo")
             }else {
                 displayMessage(message);
             }
@@ -177,8 +173,6 @@ const ChatBox = (function () {
                 // Highlight the clicked user
                 this.classList.add("selected-user");
                 const match = userDiv.id.match(/(\d+)/);
-                const userID = parseInt(match[0], 10)
-                console.log("Selected user", match[0])
                 fetchMessages(match[0]);
             };
         }
@@ -313,5 +307,4 @@ const ChatBox = (function () {
 })();
 
 export default ChatBox;
-console.log(UserID)
 export {UserID};

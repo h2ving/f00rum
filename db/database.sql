@@ -1,4 +1,3 @@
--- what is the meaning of life
 
 CREATE TABLE IF NOT EXISTS `Users` (
 		`userID` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,8 +24,6 @@ CREATE TABLE IF NOT EXISTS `Comments` (
 	`threadID` INTEGER NOT NULL,
 	`content` TEXT NOT NULL,
 	`createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
-	`upvotes` INTEGER DEFAULT 0,
-    `downvotes` INTEGER DEFAULT 0,
 	FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
 	FOREIGN KEY (threadID) REFERENCES Threads(threadID) ON DELETE CASCADE
 );
@@ -40,7 +37,6 @@ CREATE TABLE IF NOT EXISTS 'ChatMessages' (
     FOREIGN KEY (senderID) REFERENCES Users(userID),
     FOREIGN KEY (receiverID) REFERENCES Users(userID)
 );
-
 
 CREATE TABLE IF NOT EXISTS `Sessions` (
     `sessionID` TEXT PRIMARY KEY,
@@ -57,8 +53,6 @@ CREATE TABLE IF NOT EXISTS `Threads` (
     `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `categoryID` INTEGER NOT NULL,
     `userID` INTEGER NOT NULL,
-    `upvotes` INTEGER DEFAULT 0,
-    `downvotes` INTEGER DEFAULT 0,
     FOREIGN KEY (categoryID) REFERENCES Categories(categoryID) ON DELETE CASCADE,
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
 );

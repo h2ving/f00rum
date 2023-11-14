@@ -18,13 +18,13 @@ VALUES
 (9, 'FLStudio', 'Improving your flstudio skills', '2023-11-02 17:13:48', 4, 1);
 
 -- Inserting mock data into Comments table
-INSERT INTO Comments (commentID, userID, threadID, content, createdAt, upvotes, downvotes)
+INSERT INTO Comments (commentID, userID, threadID, content, createdAt)
 VALUES
-(1, 1, 1, 'Great tips for software development', '2023-11-02 15:15:00', 10, 2),
-(2, 2, 1, 'I found these tips really helpful!', '2023-11-02 15:30:00', 5, 1),
-(3, 1, 3, 'Thanks for sharing this!', '2023-11-02 15:45:00', 8, 0),
-(4, 3, 5, 'Heres my favorite coffee recipe...', '2023-11-02 17:20:00', 15, 3),
-(5, 4, 5, 'Ill definitely try this recipe!', '2023-11-02 17:30:00', 7, 1);
+(1, 1, 1, 'Great tips for software development', '2023-11-02 15:15:00'),
+(2, 2, 1, 'I found these tips really helpful!', '2023-11-02 15:30:00'),
+(3, 1, 3, 'Thanks for sharing this!', '2023-11-02 15:45:00'),
+(4, 3, 5, 'Heres my favorite coffee recipe...', '2023-11-02 17:20:00'),
+(5, 4, 5, 'Ill definitely try this recipe!', '2023-11-02 17:30:00');
 
 INSERT INTO Users (username, password, email, firstName, lastName, age, gender)
 VALUES
@@ -38,6 +38,10 @@ INSERT INTO Votes (type, userID, threadID, commentID)
 VALUES
     ('upvote', 1, 1, NULL),
     ('downvote', 2, 2, NULL),
-    ('upvote', 3, NULL, 2);
+    ('upvote', 3, NULL, 1),
+    ('upvote', 4, NULL, 1),
+    ('upvote', 5, NULL, 1),
+    ('downvote', 6, NULL, 1),
+    ('downvote', 7, NULL, 1);
 
 

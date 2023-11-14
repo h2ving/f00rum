@@ -33,7 +33,7 @@ func GetThreadsByCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get threads from server: ", http.StatusInternalServerError)
 		return
 	}
-	
+
 	response, _ := json.Marshal(threads)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -42,38 +42,36 @@ func GetThreadsByCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateThreadsHandler(w http.ResponseWriter, r *http.Request) {
 	var request struct {
-		Title   	string 	`json:"title"`
-		Content 	string 	`json:"content"`
-		CategoryID  int 	`json:"categoryID"`
-		UserID 		int 	`json:"userID"`
+		Title      string `json:"title"`
+		Content    string `json:"content"`
+		CategoryID int    `json:"categoryID"`
+		UserID     int    `json:"userID"`
 	}
-	fmt.Println()
 	// Decode the incoming JSON request
-    err := json.NewDecoder(r.Body).Decode(&request)
-    if err != nil {
-        http.Error(w, "Failed to parse request data", http.StatusBadRequest)
-        return
-    }
-	fmt.Println(request.CategoryID, request.Title, request.Content, request.UserID)
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, "Failed to parse request data", http.StatusBadRequest)
+		return
+	}
 
-	threadID, err := forum.CreateThread(request.Title, request.Content,request.CategoryID, request.UserID)
-    if err != nil {
-        http.Error(w, "Failed to create the thread", http.StatusInternalServerError)
-        return
-    }
+	threadID, err := forum.CreateThread(request.Title, request.Content, request.CategoryID, request.UserID)
+	if err != nil {
+		http.Error(w, "Failed to create the thread", http.StatusInternalServerError)
+		return
+	}
 
 	// If successful, create a response
-    response := map[string]interface{}{
-        "message": "Thread created successfully",
-        "data":    threadID,
-    }
+	response := map[string]interface{}{
+		"message": "Thread created successfully",
+		"data":    threadID,
+	}
 
-    // Send the response
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
+	// Send the response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
-func GetComments(w http.ResponseWriter, r *http.Request) {
+func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	threadID := r.URL.Query().Get("threadID")
 	threadIDInt, err := strconv.Atoi(threadID)
 	if err != nil {
@@ -99,63 +97,59 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 }
 
 func VoteHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodPost {
-        http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-        return
-    }
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
 
-    var voteData struct {
-        CommentID int    `json:"commentID"`
-        Action    string `json:"action"`
-        UserID    int    `json:"userID"`
-    }
+	var voteData struct {
+		Item   string `json:"item"`
+		ItemID int    `json:"itemID"`
+		Action string `json:"action"`
+		UserID int    `json:"userID"`
+	}
 
-    if err := json.NewDecoder(r.Body).Decode(&voteData); err != nil {
-        http.Error(w, "Failed to parse request data", http.StatusBadRequest)
-        return
-    }
+	if err := json.NewDecoder(r.Body).Decode(&voteData); err != nil {
+		http.Error(w, "Failed to parse request data", http.StatusBadRequest)
+		return
+	}
+	forum.VoteItem(voteData.ItemID, voteData.UserID, voteData.Action, voteData.Item)
+	upvotes, downvotes, _ := forum.GetItemVotes(voteData.Item, voteData.ItemID)
+	// Create a response struct for the votes
+	response := struct {
+		Upvotes   int `json:"upvotes"`
+		Downvotes int `json:"downvotes"`
+	}{
+		Upvotes:   upvotes,
+		Downvotes: downvotes,
+	}
 
-    var upvoteCount, downvoteCount int // Initialize variables with zero values
-    var err error
-    switch voteData.Action {
-    case "upvote":
-        upvoteCount, err = forum.Upvote(voteData.CommentID, voteData.UserID)
-    case "downvote":
-        downvoteCount, err = forum.Downvote(voteData.CommentID, voteData.UserID)
-    default:
-        http.Error(w, "Invalid action provided", http.StatusBadRequest)
-        return
-    }
+	responseData, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Failed to marshal response data", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(responseData)
+	if err != nil {
+		// Handle error writing response here
+		return
+	}
 
-    if err != nil {
-        http.Error(w, "Failed to update vote", http.StatusInternalServerError)
-        return
-    }
-
-    response := map[string]interface{}{
-        "Upvotes": upvoteCount,
-		"Downvotes": downvoteCount,
-    }
-
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    if err := json.NewEncoder(w).Encode(response); err != nil {
-        http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-        return
-    }
 }
 
 func GetVotesHandler(w http.ResponseWriter, r *http.Request) {
 	threadID := r.URL.Query().Get("threadID")
-	threadIDInt, err := strconv.Atoi(threadID);
+	threadIDInt, err := strconv.Atoi(threadID)
 	if err != nil {
 		fmt.Println("Error converting threadID to int", http.StatusInternalServerError)
 	}
-	votes, err := forum.GetCommentVotes(threadIDInt)
-	if err != nil {
-		fmt.Println("Failed to fetch votes", http.StatusInternalServerError)
-	}
-	
+	// votes, err := forum.GetVotes(threadIDInt)
+	// if err != nil {
+	// 	fmt.Println("Failed to fetch votes", http.StatusInternalServerError)
+	// }
+	votes := threadIDInt
 	response, err := json.Marshal(votes)
 	if err != nil {
 		http.Error(w, "Failed to serialize comments", http.StatusInternalServerError)

@@ -2,7 +2,6 @@ package chat
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -138,7 +137,6 @@ func NewUserWsAlert(newUserID int, h *Hub) {
 		"action": "newUser",
 		"data":   newUserID,
 	}
-	fmt.Println(message)
 	jsonData, _ := json.Marshal(message)
 	// Broadcast the message to all connected clients
 	h.Broadcast <- jsonData
@@ -149,7 +147,6 @@ func DisconnectedUserWsAlert(newUserID int, h *Hub) {
 		"action": "disconnectUser",
 		"data":   newUserID,
 	}
-	fmt.Println(message)
 	jsonData, _ := json.Marshal(message)
 	// Broadcast the message to all connected clients
 	h.Broadcast <- jsonData

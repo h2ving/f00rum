@@ -1,6 +1,7 @@
 package forum
 
 import (
+	"database/sql"
 	"fmt"
 	"real-time-forum/db"
 )
@@ -80,90 +81,63 @@ func GetComments(threadID int) ([]Comment, error) {
 	var comments []Comment
 	for result.Next() {
 		var comment Comment
-		if err := result.Scan(&comment.CommentID, &comment.UserID, &comment.ThreadID, &comment.Content, &comment.CreatedAt, &comment.Upvotes, &comment.Downvotes); err != nil {
+		if err := result.Scan(&comment.CommentID, &comment.UserID, &comment.ThreadID, &comment.Content, &comment.CreatedAt); err != nil {
 			fmt.Println("Error scanning comments: ", err)
 			return nil, err
 		}
 		comments = append(comments, comment)
 	}
+	for i, comment := range comments {
+		upvotes, downvotes, _ := GetItemVotes("comment", comment.CommentID)
+		comments[i].Upvotes = upvotes
+		comments[i].Downvotes = downvotes
+	}
 	return comments, nil
 }
 
-func Upvote(commentID, userID int) (int, error) {
-	// Update the comment Likes count
-	query := `UPDATE Comments SET upvotes = upvotes + 1 WHERE commentID = ?`
-	_, err := db.Dbase.Exec(query, commentID)
+// Item is either thread or comment
+
+func VoteItem(itemID, userID int, rating, item string) error {
+	// Check if the user has already rated the item
+	var ratingDB string
+	query := fmt.Sprintf("SELECT type FROM Votes WHERE %sID = ? AND userID = ?", item)
+	err := db.Dbase.QueryRow(query, itemID, userID).Scan(&ratingDB)
 	if err != nil {
-		fmt.Println("Error upvoting comment: ", err)
-		return 0, err
+		if err == sql.ErrNoRows {
+			_, err = db.Dbase.Exec(fmt.Sprintf("INSERT INTO Votes (%sID, userID, type) VALUES (?, ?, ?)", item), itemID, userID, rating)
+			fmt.Println(err)
+			return err
+		}
+		return err
+	}
+	if rating == ratingDB {
+		// If the user has already rated the item with the same rating, remove the rating
+		_, err = db.Dbase.Exec(fmt.Sprintf("DELETE FROM Votes WHERE %sID = ? AND userID = ?", item), itemID, userID)
+		return err
 	}
 
-	// Insert the upvote action in LikesDislikes table
-	query = `INSERT INTO Votes (type, userID, commentID) VALUES (?, ?, ?)`
-	_, err = db.Dbase.Exec(query, "upvote", userID, commentID)
-	if err != nil {
-		fmt.Println("Error recording upvote action: ", err)
-		return 0, err
-	}
-	// Retrieve the updated like count
-	var updatedLikes int
-	err = db.Dbase.QueryRow("SELECT upvotes FROM Comments WHERE commentID = ?", commentID).Scan(&updatedLikes)
-	if err != nil {
-		fmt.Println("Error retrieving updated likes: ", err)
-		return 0, err
-	}
-
-	return updatedLikes, nil
-}
-func Downvote(commentID, userID int) (int, error) {
-	// Update the comment downvotes count
-	query := `UPDATE Comments SET downvotes = downvotes + 1 WHERE commentID = ?`
-	_, err := db.Dbase.Exec(query, commentID)
-	if err != nil {
-		fmt.Println("Error downvoting comment: ", err)
-		return 0, err
-	}
-
-	// Insert the downvote action in LikesDislikes table
-	query = `INSERT INTO Votes (type, userID, commentID) VALUES (?, ?, ?)`
-	_, err = db.Dbase.Exec(query, "downvote", userID, commentID)
-	if err != nil {
-		fmt.Println("Error recording downvote action: ", err)
-		return 0, err
-	}
-	// Retrieve the updated dislike count
-	var updatedDislikes int
-	err = db.Dbase.QueryRow("SELECT downvotes FROM Comments WHERE commentID = ?", commentID).Scan(&updatedDislikes)
-	if err != nil {
-		fmt.Println("Error retrieving updated dislikes: ", err)
-		return 0, err
-	}
-
-	return updatedDislikes, nil
+	// If the user has rated the item differently, update the rating
+	_, err = db.Dbase.Exec(fmt.Sprintf("UPDATE Votes SET type = ? WHERE %sID = ? AND userID = ?", item), rating, itemID, userID)
+	return err
 }
 
-// GetVotes retrieves all votes related to a specific threadID through comments
-func GetCommentVotes(threadID int) ([]Vote, error) {
-    query := `SELECT l.voteID, l.type, l.userID, l.threadID, l.commentID 
-              FROM Votes l
-              INNER JOIN Comments c ON l.commentID = c.commentID 
-              WHERE c.threadID = ?`
+func GetItemVotes(itemType string, itemID int) (int, int, error) {
+	likes := 0
+	dislikes := 0
+	upvoteStr := "upvote"
+	downvoteStr := "downvote"
 
-    rows, err := db.Dbase.Query(query, threadID)
-    if err != nil {
-        fmt.Println("Error querying votes: ", err)
-        return nil, err
-    }
-    defer rows.Close()
+	queryLike := fmt.Sprintf("SELECT COUNT(*) FROM Votes WHERE %sID = ? AND type = ?", itemType)
+	queryDislike := fmt.Sprintf("SELECT COUNT(*) FROM Votes WHERE %sID = ? AND type = ?", itemType)
+	err := db.Dbase.QueryRow(queryLike, itemID, upvoteStr).Scan(&likes)
+	if err != nil {
+		return likes, dislikes, err
+	}
 
-    var votes []Vote
-    for rows.Next() {
-        var vote Vote
-        if err := rows.Scan(&vote.VoteID, &vote.Type, &vote.UserID, &vote.ThreadID, &vote.CommentID); err != nil {
-            fmt.Println("Error scanning votes: ", err)
-            return nil, err
-        }
-        votes = append(votes, vote)
-    }
-    return votes, nil
+	err = db.Dbase.QueryRow(queryDislike, itemID, downvoteStr).Scan(&dislikes)
+	if err != nil {
+		return likes, dislikes, err
+	}
+
+	return likes, dislikes, nil
 }

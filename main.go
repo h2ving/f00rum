@@ -32,7 +32,7 @@ func main() {
 	mux.HandleFunc("/api/categories", handlers.GetCategoriesHandler).Methods("GET")
 	mux.HandleFunc("/api/threads", handlers.GetThreadsByCategoryHandler).Methods("GET")
 	mux.HandleFunc("/api/threads", handlers.CreateThreadsHandler).Methods("POST")
-	mux.HandleFunc("/api/comments", handlers.GetComments).Methods("GET")
+	mux.HandleFunc("/api/comments", handlers.GetCommentsHandler).Methods("GET")
 	mux.HandleFunc("/api/vote", handlers.VoteHandler).Methods("POST")
 	mux.HandleFunc("/api/votes", handlers.GetVotesHandler).Methods("GET")
 

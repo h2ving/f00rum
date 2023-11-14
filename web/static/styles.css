@@ -703,3 +703,7 @@ header {
     margin-left: 3px;
     font-size: 14px;
 }
+
+.like-button {
+    right: 70px;
+}

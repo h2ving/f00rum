@@ -1,7 +1,7 @@
 import { UserID } from './chatbox.js';
 
 const ForumFeed = (function () {
-    var stateCategorySelector = false;
+    let stateCategorySelector = false;
     // Load the forum content
     function init() {
         const container = document.querySelector('.feedContainer');
@@ -169,7 +169,6 @@ const ForumFeed = (function () {
             }
 
             const data = await response.json();
-            console.log(data);
             displayThreads(data);
         } catch (error) {
             console.error('Error fetching threads:', error);
@@ -185,7 +184,6 @@ const ForumFeed = (function () {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log(data)
             return data; //Return the fetched comments
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -222,7 +220,6 @@ const ForumFeed = (function () {
             const contentElement = document.createElement('p');
             contentElement.textContent = thread.content;
             threadElement.appendChild(contentElement);
-            console.log(thread.threadID)
             // Additional data attributes if needed
             threadElement.setAttribute('id', thread.threadID);
             // Add other data attributes as required
@@ -231,19 +228,18 @@ const ForumFeed = (function () {
             threadsDiv.appendChild(threadElement);
 
             // Add event listener for when a thread is clicked
-            threadElement.addEventListener('click', () => {
+            threadElement.addEventListener('click', async () => {
                 // Your logic for handling the click event on a thread
                 // For example, displaying the full content or opening the thread
                 console.log('Thread ID:', thread.threadID);
                 console.log('Full Content:', thread.content);
-                displayThreadContent(thread);
+                await displayThreadContent(thread);
             });
         });
     }
 
     async function displayThreadContent(thread) {
-        //Votes
-        votes = fetchVotes(thread.threadID)
+
         //Overlay modal
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
@@ -273,25 +269,26 @@ const ForumFeed = (function () {
                 commentContent.textContent = comment.content;
                 commentListItem.appendChild(commentContent);
 
-                console.log(votes)
 
                 /// Like Button
                 const likeButton = document.createElement('button');
-                likeButton.innerHTML = '<span>&uarr;</span> <span class="like-count">' + comment.Upvotes + '</span>';
+                likeButton.innerHTML = '<span>&uarr;</span> <span class="like-count">' + comment.upvotes + '</span>';
                 likeButton.classList.add('like-button');
                 likeButton.addEventListener('click', async () => {
-                    const updatedLikes = await handleVote(comment.commentID, 'upvote');
-                    likeButton.querySelector('.like-count').textContent = updatedLikes;
+                    const updatedvotes = await handleVote(comment.commentID, 'upvote', "comment");
+                    likeButton.querySelector('.like-count').textContent = updatedvotes.upvotes;
+                    dislikeButton.querySelector('.dislike-count').textContent = updatedvotes.downvotes;
                 });
                 commentListItem.appendChild(likeButton);
 
                 // Dislike Button
                 const dislikeButton = document.createElement('button');
-                dislikeButton.innerHTML = '<span>&darr;</span> <span class="dislike-count">' + comment.Downvotes + '</span>';
+                dislikeButton.innerHTML = '<span>&darr;</span> <span class="dislike-count">' + comment.downvotes + '</span>';
                 dislikeButton.classList.add('dislike-button');
                 dislikeButton.addEventListener('click', async () => {
-                    const updatedDislikes = await handleVote(comment.commentID, 'downvote');
-                    dislikeButton.querySelector('.dislike-count').textContent = updatedDislikes;
+                    const updatedvotes = await handleVote(comment.commentID, 'downvote', "comment");
+                    likeButton.querySelector('.like-count').textContent = updatedvotes.upvotes;
+                    dislikeButton.querySelector('.dislike-count').textContent = updatedvotes.downvotes;
                 });
                 commentListItem.appendChild(dislikeButton);
 
@@ -318,8 +315,10 @@ const ForumFeed = (function () {
         overlay.style.display = 'block';
     }
 
+
+
     // Function to handle upvote or downvote
-    async function handleVote(commentID, action) {
+    async function handleVote(itemID, action, item) {
         let UserIDInt = parseInt(UserID);
         try {
             const response = await fetch('/api/vote', {
@@ -327,13 +326,12 @@ const ForumFeed = (function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ commentID, action, UserIDInt }),
+                body: JSON.stringify({ itemID: itemID, action: action, userID: UserIDInt, item: item}),
             });
 
             if (response.ok) {
-                const updatedComment = await response.json();
-
-                return action === 'upvote' ? updatedComment.Upvotes : updatedComment.Downvotes;
+                const data = await response.json();
+                return data
             } else {
                 console.error('Failed to update the upvote/downvote');
                 return undefined; // or any default value you want to handle the error
@@ -351,7 +349,6 @@ const ForumFeed = (function () {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log(data)
             return data; //Return the fetched votes
         } catch (error) {
             console.error('Error fetching comments:', error);
