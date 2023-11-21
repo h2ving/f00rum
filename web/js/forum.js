@@ -341,6 +341,7 @@ const ForumFeed = (function () {
         }
     }
 
+    // DEPRECATED
     async function fetchVotes(threadID) {
         try {
             const response = await fetch(`/api/votes?threadID=${threadID}`);

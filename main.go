@@ -36,6 +36,10 @@ func main() {
 	mux.HandleFunc("/api/vote", handlers.VoteHandler).Methods("POST")
 	mux.HandleFunc("/api/votes", handlers.GetVotesHandler).Methods("GET")
 
+	// endpoints for user page
+	mux.HandleFunc("/api/user", handlers.GetUserThreadsHandler).Methods("GET")
+	mux.HandleFunc("/api/uservotes", handlers.GetUserUpvotesHandler).Methods("GET")
+
 	// Catch-all route to serve index.html for all other routes
 	mux.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/static/index.html")
