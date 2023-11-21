@@ -169,6 +169,7 @@ const ForumFeed = (function () {
             }
 
             const data = await response.json();
+            console.log(data);
             displayThreads(data);
         } catch (error) {
             console.error('Error fetching threads:', error);
@@ -257,6 +258,28 @@ const ForumFeed = (function () {
         contentElement.textContent = thread.content;
         threadContentModal.appendChild(contentElement);
 
+        const threadupvotes = await fetchVotes(thread.threadID)
+        /// Thread upvote Button
+        const threadupvoteButton = document.createElement('button');
+        threadupvoteButton.innerHTML = '<span>&uarr;</span> <span class="upvote-count">' + threadupvotes.upvotes + '</span>';
+        threadupvoteButton.classList.add('upvote-button');
+        threadupvoteButton.addEventListener('click', async () => {
+            const updatedvotes = await handleVote(thread.threadID, 'upvote', "thread");
+            threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+            threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
+        });
+        threadContentModal.appendChild(threadupvoteButton);
+        console.log(threadupvotes)
+        // Thread downvote Button
+        const threaddownvoteButton = document.createElement('button');
+        threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadupvotes.downvotes + '</span>';
+        threaddownvoteButton.classList.add('downvote-button');
+        threaddownvoteButton.addEventListener('click', async () => {
+            const updatedvotes = await handleVote(thread.threadID, 'downvote', "thread");
+            threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+            threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
+        });
+        threadContentModal.appendChild(threaddownvoteButton);
         const comments = await fetchComments(thread.threadID);
         if (comments && comments.length > 0) {
             const commentsList = document.createElement('ul');
@@ -270,27 +293,27 @@ const ForumFeed = (function () {
                 commentListItem.appendChild(commentContent);
 
 
-                /// Like Button
-                const likeButton = document.createElement('button');
-                likeButton.innerHTML = '<span>&uarr;</span> <span class="like-count">' + comment.upvotes + '</span>';
-                likeButton.classList.add('like-button');
-                likeButton.addEventListener('click', async () => {
+                /// Comment upvote Button
+                const upvoteButton = document.createElement('button');
+                upvoteButton.innerHTML = '<span>&uarr;</span> <span class="upvote-count">' + comment.upvotes + '</span>';
+                upvoteButton.classList.add('upvote-button');
+                upvoteButton.addEventListener('click', async () => {
                     const updatedvotes = await handleVote(comment.commentID, 'upvote', "comment");
-                    likeButton.querySelector('.like-count').textContent = updatedvotes.upvotes;
-                    dislikeButton.querySelector('.dislike-count').textContent = updatedvotes.downvotes;
+                    upvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+                    downvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
                 });
-                commentListItem.appendChild(likeButton);
+                commentListItem.appendChild(upvoteButton);
 
-                // Dislike Button
-                const dislikeButton = document.createElement('button');
-                dislikeButton.innerHTML = '<span>&darr;</span> <span class="dislike-count">' + comment.downvotes + '</span>';
-                dislikeButton.classList.add('dislike-button');
-                dislikeButton.addEventListener('click', async () => {
+                // Comment downvote Button
+                const downvoteButton = document.createElement('button');
+                downvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + comment.downvotes + '</span>';
+                downvoteButton.classList.add('downvote-button');
+                downvoteButton.addEventListener('click', async () => {
                     const updatedvotes = await handleVote(comment.commentID, 'downvote', "comment");
-                    likeButton.querySelector('.like-count').textContent = updatedvotes.upvotes;
-                    dislikeButton.querySelector('.dislike-count').textContent = updatedvotes.downvotes;
+                    upvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+                    downvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
                 });
-                commentListItem.appendChild(dislikeButton);
+                commentListItem.appendChild(downvoteButton);
 
                 commentsList.appendChild(commentListItem);
             });

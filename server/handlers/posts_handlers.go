@@ -145,17 +145,28 @@ func GetVotesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error converting threadID to int", http.StatusInternalServerError)
 	}
-	// votes, err := forum.GetVotes(threadIDInt)
-	// if err != nil {
-	// 	fmt.Println("Failed to fetch votes", http.StatusInternalServerError)
-	// }
-	votes := threadIDInt
-	response, err := json.Marshal(votes)
+	upvotes, downvotes, err := forum.GetItemVotes("thread", threadIDInt)
 	if err != nil {
-		http.Error(w, "Failed to serialize comments", http.StatusInternalServerError)
+		fmt.Println("Failed to fetch votes", http.StatusInternalServerError)
+	}
+	response := struct {
+		Upvotes   int `json:"upvotes"`
+		Downvotes int `json:"downvotes"`
+	}{
+		Upvotes:   upvotes,
+		Downvotes: downvotes,
+	}
+
+	responseData, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Failed to marshal response data", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	_, err = w.Write(responseData)
+	if err != nil {
+		// Handle error writing response here
+		return
+	}
 }

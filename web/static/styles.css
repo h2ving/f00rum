@@ -679,8 +679,8 @@ header {
     /* Remove default padding for <p> */
 }
 
-.like-button,
-.dislike-button {
+.upvote-button,
+.downvote-button {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -690,20 +690,20 @@ header {
     cursor: pointer;
 }
 
-.like-button>span,
-.dislike-button>span {
+.upvote-button>span,
+.downvote-button>span {
     display: inline-block;
     font-size: 20px;
     margin-right: 5px;
 }
 
-.like-button>span::after,
-.dislike-button>span::after {
+.upvote-button>span::after,
+.downvote-button>span::after {
     content: attr(data-count);
     margin-left: 3px;
     font-size: 14px;
 }
 
-.like-button {
+.upvote-button {
     right: 70px;
 }
