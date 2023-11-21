@@ -8,6 +8,7 @@ body {
     padding: 0;
 }
 
+/*
 .container {
     background-color: #0a1f1f;
     max-width: 800px;
@@ -17,6 +18,7 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+*/
 
 .container h2 {
     color: #009882;
@@ -44,6 +46,15 @@ header {
 #name {
     margin-left: 75%;
     font-size: 18px;
+    color: white;
+    text-decoration: none;
+}
+
+.userpage-button {
+    margin-left: 75%;
+    font-size: 18px;
+    color: white;
+    text-decoration: none;
 }
 
 /* Login form in header */
@@ -222,20 +233,26 @@ header {
 .online {
     width: 8px;
     height: 8px;
-    background-color: #4076e5; /* color for online status */
-    border-radius: 50%; /* Make it a circle */
+    background-color: #4076e5;
+    /* color for online status */
+    border-radius: 50%;
+    /* Make it a circle */
     display: inline-block;
-    right: 0; /* Adjust spacing between the indicator and the username */
+    right: 0;
+    /* Adjust spacing between the indicator and the username */
 }
 
 /* Style for offline status indicator (gray dot) */
 .offline {
     width: 8px;
     height: 8px;
-    background-color: #ccc; /* Gray color for offline status */
-    border-radius: 50%; /* Make it a circle */
+    background-color: #ccc;
+    /* Gray color for offline status */
+    border-radius: 50%;
+    /* Make it a circle */
     display: inline-block;
-    right: 0;  /* Adjust spacing between the indicator and the username */
+    right: 0;
+    /* Adjust spacing between the indicator and the username */
 }
 
 
@@ -271,9 +288,11 @@ header {
 
 /* Style for the chat container to make it scrollable */
 .chat-messages {
-    max-height: 400px; /* Set a maximum height for the chat messages */
+    max-height: 400px;
+    /* Set a maximum height for the chat messages */
     overflow-y: auto;
-    word-wrap: anywhere;/* Enable vertical scrolling for overflow content */
+    word-wrap: anywhere;
+    /* Enable vertical scrolling for overflow content */
 
 }
 
@@ -322,7 +341,7 @@ header {
 }
 
 /* New styles for the custom threads */
-#threads {
+#threads #user-threads #upvoted-threads {
     margin-top: 20px;
 }
 
@@ -644,9 +663,12 @@ header {
 }
 
 @keyframes blink {
-    0%, 100% {
+
+    0%,
+    100% {
         background-color: orange;
     }
+
     50% {
         background-color: red;
     }
@@ -706,4 +728,48 @@ header {
 
 .upvote-button {
     right: 70px;
+}
+
+/* User Page Styles */
+.userpage-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #0a1f1f;
+    /* Text color */
+}
+
+/* User Page Styles */
+
+.userpage-container h3 {
+    color: #009882;
+    /* Username color */
+    margin-bottom: 15px;
+}
+
+/* Styling for upvoted threads and comments can be added here */
+
+/* Styling for upvote/downvote buttons if needed */
+.upvote-button,
+.downvote-button {
+    /* Your button styles here */
+    /* Example styles */
+    background-color: #3498db;
+    /* Default color */
+    color: #fff;
+    /* Text color */
+    padding: 8px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.upvote-button:hover,
+.downvote-button:hover {
+    background-color: #2980b9;
+    /* Hover color */
 }
