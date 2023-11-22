@@ -256,6 +256,12 @@ const ForumFeed = (function () {
         titleElement.textContent = thread.title;
         threadContentModal.appendChild(titleElement);
 
+        // Author
+        const threadAuthor = document.createElement('small');
+        threadAuthor.textContent = thread.username;
+        threadAuthor.style.color = '#009882';
+        threadContentModal.appendChild(threadAuthor);
+
         // Content
         const contentElement = document.createElement('p');
         contentElement.textContent = thread.content;
@@ -272,7 +278,6 @@ const ForumFeed = (function () {
             threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
         });
         threadContentModal.appendChild(threadupvoteButton);
-        console.log(threadupvotes)
         // Thread downvote Button
         const threaddownvoteButton = document.createElement('button');
         threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadupvotes.downvotes + '</span>';
@@ -295,6 +300,10 @@ const ForumFeed = (function () {
                 commentContent.textContent = comment.content;
                 commentListItem.appendChild(commentContent);
 
+                const commentAuthor = document.createElement('small');
+                commentAuthor.textContent = comment.username;
+                commentAuthor.style.color = '#009882';
+                commentListItem.appendChild(commentAuthor);
 
                 /// Comment upvote Button
                 const upvoteButton = document.createElement('button');

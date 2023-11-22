@@ -733,6 +733,19 @@ header {
     right: 70px;
 }
 
+.thread-content-modal > .upvote-button,
+.thread-content-modal > .downvote-button {
+    position: absolute;
+    cursor: pointer;
+    bottom: 36%;
+    right: 30px
+}
+
+.thread-content-modal > .upvote-button {
+    right: 93px; /* Adjust this value for desired positioning */
+}
+
+
 /* User Page Styles */
 .userpage-container {
     max-width: 800px;

@@ -43,6 +43,7 @@ func GetThreadsByCategoryID(categoryID string) ([]Thread, error) {
 			fmt.Println("Error scanning threads: ", err)
 			return nil, err
 		}
+		thread.Username = GetUserByID(thread.UserID)
 		threads = append(threads, thread)
 	}
 	return threads, nil
@@ -91,6 +92,7 @@ func GetComments(threadID int) ([]Comment, error) {
 		upvotes, downvotes, _ := GetItemVotes("comment", comment.CommentID)
 		comments[i].Upvotes = upvotes
 		comments[i].Downvotes = downvotes
+		comments[i].Username = GetUserByID(comments[i].UserID)
 	}
 	return comments, nil
 }
@@ -162,4 +164,15 @@ func GetItemVotes(itemType string, itemID int) (int, int, error) {
 	}
 
 	return likes, dislikes, nil
+}
+
+func GetUserByID(UserID int) string {
+	query := "SELECT username FROM Users WHERE userID = ?"
+	var username string
+	err := db.Dbase.QueryRow(query, UserID).Scan(&username)
+	if err != nil {
+		fmt.Println("No user with selected ID")
+		return ""
+	}
+	return username
 }
