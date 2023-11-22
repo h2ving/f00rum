@@ -146,6 +146,7 @@ function loadForumContent() {
 function loadUserPage() {
     const header = document.querySelector('header');
     const nameParagraph = document.createElement('a'); // Create a new <p> element
+    nameParagraph.className = 'userpage-button';
     nameParagraph.id = 'name'; // Set the id attribute
     const username = localStorage.getItem('username');
     nameParagraph.textContent = username.toString();

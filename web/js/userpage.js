@@ -1,3 +1,5 @@
+import { UserID } from "./chatbox.js";
+
 const UserPage = (function () {
 
     function init() {
@@ -135,19 +137,41 @@ const UserPage = (function () {
         //Overlay modal
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
+        overlay.id = "overlay";
 
         const threadContentModal = document.createElement('div');
         threadContentModal.classList.add('thread-content-modal');
 
+        // Close button
+        const closeButton = document.createElement('span');
+        closeButton.innerHTML = '&times;';
+        closeButton.classList.add('close-button');
+        closeButton.addEventListener('click', () => {
+            // Close the modal and overlay
+            //threadContentModal.style.display = 'none';
+            //overlay.style.display = 'none';
+            document.querySelector("#overlay").remove(); //REMOVE OVERLAY ELEMENT FROM DOM
+        });
+        threadContentModal.appendChild(closeButton);
+
+
+        const originalThreadContent = document.createElement('div');
+        originalThreadContent.classList.add('thread-main-element');
         // Title
         const titleElement = document.createElement('h3');
         titleElement.textContent = thread.title;
-        threadContentModal.appendChild(titleElement);
+        originalThreadContent.appendChild(titleElement);
+
+        // Author
+        const threadAuthor = document.createElement('small');
+        threadAuthor.textContent = thread.username;
+        threadAuthor.style.color = '#009882';
+        originalThreadContent.appendChild(threadAuthor);
 
         // Content
         const contentElement = document.createElement('p');
         contentElement.textContent = thread.content;
-        threadContentModal.appendChild(contentElement);
+        originalThreadContent.appendChild(contentElement);
 
         const threadupvotes = await fetchVotes(thread.threadID)
         /// Thread upvote Button
@@ -159,8 +183,8 @@ const UserPage = (function () {
             threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
             threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
         });
-        threadContentModal.appendChild(threadupvoteButton);
-        console.log(threadupvotes)
+        originalThreadContent.appendChild(threadupvoteButton);
+
         // Thread downvote Button
         const threaddownvoteButton = document.createElement('button');
         threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadupvotes.downvotes + '</span>';
@@ -170,7 +194,12 @@ const UserPage = (function () {
             threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
             threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
         });
-        threadContentModal.appendChild(threaddownvoteButton);
+        originalThreadContent.appendChild(threaddownvoteButton);
+
+        // append the main thread div to the whole content modal
+        threadContentModal.appendChild(originalThreadContent);
+
+        ///COMMENTS
         const comments = await fetchComments(thread.threadID);
         if (comments && comments.length > 0) {
             const commentsList = document.createElement('ul');
@@ -183,6 +212,10 @@ const UserPage = (function () {
                 commentContent.textContent = comment.content;
                 commentListItem.appendChild(commentContent);
 
+                const commentAuthor = document.createElement('small');
+                commentAuthor.textContent = comment.username;
+                commentAuthor.style.color = '#009882';
+                commentListItem.appendChild(commentAuthor);
 
                 /// Comment upvote Button
                 const upvoteButton = document.createElement('button');
@@ -211,15 +244,35 @@ const UserPage = (function () {
             threadContentModal.appendChild(commentsList);
         }
 
-        // Close button
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.addEventListener('click', () => {
-            // Close the modal and overlay
-            threadContentModal.style.display = 'none';
-            overlay.style.display = 'none';
+        // Create an input field for adding comments
+        const commentInput = document.createElement('input');
+        commentInput.setAttribute('type', 'text');
+        commentInput.setAttribute('placeholder', 'Add a comment...');
+        commentInput.classList.add('comment-input-field');
+        //threadContentModal.appendChild(commentInput);
+
+        // Create a button to submit comments
+        const commentSubmitButton = document.createElement('button');
+        commentSubmitButton.textContent = 'Submit Comment';
+        commentSubmitButton.classList.add('submit-comment-button');
+        commentSubmitButton.addEventListener('click', async () => {
+            const commentContent = commentInput.value.trim();
+            if (commentContent !== '') {
+                // Call a function to submit the comment
+                await submitComment(thread.threadID, commentContent, thread);
+                // Clear the input field after submission
+                commentInput.value = '';
+            } else {
+                alert('Please enter a comment before submitting.');
+            }
         });
-        threadContentModal.appendChild(closeButton);
+        // CREATE A DIV to append both input field and submit button to it for styling
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment-div');
+        commentDiv.appendChild(commentInput);
+        commentDiv.appendChild(commentSubmitButton);
+        threadContentModal.appendChild(commentDiv);
+
         overlay.appendChild(threadContentModal);
         // Append the modal and overlay to the body
         const feedContainer = document.querySelector('.feedContainer');
@@ -227,6 +280,59 @@ const UserPage = (function () {
 
         // Show the overlay and modal
         overlay.style.display = 'block';
+    }
+
+    async function submitComment(threadID, content, thread) {
+        let UserIDInt = parseInt(UserID);
+
+        const newComment = {
+            threadID: threadID,
+            content: content,
+            userID: UserIDInt
+        }
+        try {
+            const response = await fetch('/api/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newComment),
+            });
+            if (response.ok) {
+                console.log("New comment created successfully");
+                document.querySelector('#overlay').remove();
+                displayThreadContent(thread)
+            } else {
+                console.error('Failed to submit comment');
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error submitting comment: ', error)
+        }
+    }
+
+    // Function to handle upvote or downvote
+    async function handleVote(itemID, action, item) {
+        let UserIDInt = parseInt(UserID);
+        try {
+            const response = await fetch('/api/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ itemID: itemID, action: action, userID: UserIDInt, item: item }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data
+            } else {
+                console.error('Failed to update the upvote/downvote');
+                return undefined; // or any default value you want to handle the error
+            }
+        } catch (error) {
+            console.error('Error handling the upvote/downvote action:', error);
+        }
     }
 
     async function fetchVotes(threadID) {

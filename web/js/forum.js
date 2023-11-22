@@ -266,21 +266,42 @@ const ForumFeed = (function () {
         const threadContentModal = document.createElement('div');
         threadContentModal.classList.add('thread-content-modal');
 
+        // Close button
+        const closeButton = document.createElement('span');
+        closeButton.innerHTML = '&times;';
+        closeButton.classList.add('close-button');
+        closeButton.addEventListener('click', () => {
+            // Close the modal and overlay
+            //threadContentModal.style.display = 'none';
+            //overlay.style.display = 'none';
+            document.querySelector("#overlay").remove(); //REMOVE OVERLAY ELEMENT FROM DOM
+        });
+        threadContentModal.appendChild(closeButton);
+
+
+        const originalThreadContent = document.createElement('div');
+        originalThreadContent.classList.add('thread-main-element');
         // Title
         const titleElement = document.createElement('h3');
         titleElement.textContent = thread.title;
-        threadContentModal.appendChild(titleElement);
+        originalThreadContent.appendChild(titleElement);
 
         // Author
         const threadAuthor = document.createElement('small');
         threadAuthor.textContent = thread.username;
         threadAuthor.style.color = '#009882';
-        threadContentModal.appendChild(threadAuthor);
+        originalThreadContent.appendChild(threadAuthor);
+
+        // Created At / DATE
+        const threadCreatedAt = document.createElement('span');
+        threadCreatedAt.textContent = thread.createdAt;
+        threadCreatedAt.style.color = '#009888';
+        originalThreadContent.appendChild(threadCreatedAt);
 
         // Content
         const contentElement = document.createElement('p');
         contentElement.textContent = thread.content;
-        threadContentModal.appendChild(contentElement);
+        originalThreadContent.appendChild(contentElement);
 
         const threadvotes = await fetchVotes(thread.threadID)
         /// Thread upvote Button
@@ -292,7 +313,8 @@ const ForumFeed = (function () {
             threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
             threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
         });
-        threadContentModal.appendChild(threadupvoteButton);
+        originalThreadContent.appendChild(threadupvoteButton);
+
         // Thread downvote Button
         const threaddownvoteButton = document.createElement('button');
         threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadvotes.downvotes + '</span>';
@@ -302,7 +324,12 @@ const ForumFeed = (function () {
             threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
             threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
         });
-        threadContentModal.appendChild(threaddownvoteButton);
+        originalThreadContent.appendChild(threaddownvoteButton);
+
+        // append the main thread div to the whole content modal
+        threadContentModal.appendChild(originalThreadContent);
+
+        ///COMMENTS
         const comments = await fetchComments(thread.threadID);
         if (comments && comments.length > 0) {
             const commentsList = document.createElement('ul');
@@ -319,6 +346,13 @@ const ForumFeed = (function () {
                 commentAuthor.textContent = comment.username;
                 commentAuthor.style.color = '#009882';
                 commentListItem.appendChild(commentAuthor);
+
+                //DATE
+                const commentDate = document.createElement('span');
+                commentDate.textContent = comment.createdAt;
+                commentDate.style.color = '#002121';
+                commentListItem.appendChild(commentDate);
+
 
                 /// Comment upvote Button
                 const upvoteButton = document.createElement('button');
@@ -351,11 +385,13 @@ const ForumFeed = (function () {
         const commentInput = document.createElement('input');
         commentInput.setAttribute('type', 'text');
         commentInput.setAttribute('placeholder', 'Add a comment...');
-        threadContentModal.appendChild(commentInput);
+        commentInput.classList.add('comment-input-field');
+        //threadContentModal.appendChild(commentInput);
 
         // Create a button to submit comments
         const commentSubmitButton = document.createElement('button');
         commentSubmitButton.textContent = 'Submit Comment';
+        commentSubmitButton.classList.add('submit-comment-button');
         commentSubmitButton.addEventListener('click', async () => {
             const commentContent = commentInput.value.trim();
             if (commentContent !== '') {
@@ -367,18 +403,13 @@ const ForumFeed = (function () {
                 alert('Please enter a comment before submitting.');
             }
         });
-        threadContentModal.appendChild(commentSubmitButton);
+        // CREATE A DIV to append both input field and submit button to it for styling
+        const commentDiv = document.createElement('div');
+        commentDiv.classList.add('comment-div');
+        commentDiv.appendChild(commentInput);
+        commentDiv.appendChild(commentSubmitButton);
+        threadContentModal.appendChild(commentDiv);
 
-        // Close button
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.addEventListener('click', () => {
-            // Close the modal and overlay
-            threadContentModal.style.display = 'none';
-            overlay.style.display = 'none';
-            document.querySelector("#overlay").remove();
-        });
-        threadContentModal.appendChild(closeButton);
         overlay.appendChild(threadContentModal);
         // Append the modal and overlay to the body
         const feedContainer = document.querySelector('.feedContainer');
@@ -416,7 +447,7 @@ const ForumFeed = (function () {
             console.error('Error submitting comment: ', error)
         }
     }
-    
+
 
     // Function to handle upvote or downvote
     async function handleVote(itemID, action, item) {
@@ -427,7 +458,7 @@ const ForumFeed = (function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ itemID: itemID, action: action, userID: UserIDInt, item: item}),
+                body: JSON.stringify({ itemID: itemID, action: action, userID: UserIDInt, item: item }),
             });
 
             if (response.ok) {
