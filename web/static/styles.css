@@ -323,6 +323,12 @@ header {
 #categories {
     display: flex;
     flex-wrap: wrap;
+    width: fit-content;
+}
+
+#categories .selected-category {
+    background-color: rgb(34, 170, 175);
+    color: #333;
 }
 
 #categories div {
@@ -335,7 +341,7 @@ header {
 }
 
 #categories div:hover {
-    background-color: #d10000;
+    background-color: #5aa15d;
 }
 
 /* New styles for the custom threads */

@@ -95,6 +95,28 @@ func GetComments(threadID int) ([]Comment, error) {
 	return comments, nil
 }
 
+func CreateComment(threadID, userID int, content string) (int64, error) {
+	// Prepare the SQL statement
+    query := `
+        INSERT INTO Comments (threadID, userID, content)
+        VALUES (?, ?, ?)
+    `
+
+    // Execute the SQL statement
+    result, err := db.Dbase.Exec(query, threadID, userID, content)
+    if err != nil {
+        return 0, err
+    }
+
+    // Retrieve the last inserted ID (commentID)
+    lastInsertID, err := result.LastInsertId()
+    if err != nil {
+        return 0, err
+    }
+
+    return lastInsertID, nil
+}
+
 // Item is either thread or comment
 
 func VoteItem(itemID, userID int, rating, item string) error {

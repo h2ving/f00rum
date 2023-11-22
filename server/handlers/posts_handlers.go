@@ -96,6 +96,33 @@ func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
+func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		ThreadID int `json:"threadID"`
+		Content string `json:"content"`
+		UserID int `json:"userID"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, "Failed to decode comment", http.StatusBadRequest)
+		return
+	}
+
+	commentID, err := forum.CreateComment(request.ThreadID, request.UserID, request.Content)
+	if err != nil {
+		http.Error(w, "Failed to create comment", http.StatusInternalServerError)
+		return
+	}
+	
+	response := map[string]interface{}{
+		"message": "Comment created successfully",
+		"data": commentID,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
 func VoteHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

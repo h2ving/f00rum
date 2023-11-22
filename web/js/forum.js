@@ -50,8 +50,12 @@ const ForumFeed = (function () {
         const submitModalButton = document.getElementById('submitModalButton');
 
         categoriesDiv.addEventListener('click', (event) => {
+            document.querySelectorAll('#categories div').forEach(div => {
+                div.classList.remove('selected-category')
+            })
             if (event.target.tagName === 'DIV') {
                 const categoryID = event.target.dataset.categoryID;
+                event.target.classList.add('selected-category');
                 stateCategorySelector = true;
                 fetchThreads(categoryID)
             }
@@ -242,6 +246,7 @@ const ForumFeed = (function () {
         //Overlay modal
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
+        overlay.id = "overlay";
 
         const threadContentModal = document.createElement('div');
         threadContentModal.classList.add('thread-content-modal');
@@ -318,6 +323,28 @@ const ForumFeed = (function () {
             threadContentModal.appendChild(commentsList);
         }
 
+        // Create an input field for adding comments
+        const commentInput = document.createElement('input');
+        commentInput.setAttribute('type', 'text');
+        commentInput.setAttribute('placeholder', 'Add a comment...');
+        threadContentModal.appendChild(commentInput);
+
+        // Create a button to submit comments
+        const commentSubmitButton = document.createElement('button');
+        commentSubmitButton.textContent = 'Submit Comment';
+        commentSubmitButton.addEventListener('click', async () => {
+            const commentContent = commentInput.value.trim();
+            if (commentContent !== '') {
+                // Call a function to submit the comment
+                await submitComment(thread.threadID, commentContent, thread);
+                // Clear the input field after submission
+                commentInput.value = '';
+            } else {
+                alert('Please enter a comment before submitting.');
+            }
+        });
+        threadContentModal.appendChild(commentSubmitButton);
+
         // Close button
         const closeButton = document.createElement('button');
         closeButton.textContent = 'Close';
@@ -325,6 +352,7 @@ const ForumFeed = (function () {
             // Close the modal and overlay
             threadContentModal.style.display = 'none';
             overlay.style.display = 'none';
+            document.querySelector("#overlay").remove();
         });
         threadContentModal.appendChild(closeButton);
         overlay.appendChild(threadContentModal);
@@ -336,7 +364,35 @@ const ForumFeed = (function () {
         overlay.style.display = 'block';
     }
 
+    async function submitComment(threadID, content, thread) {
+        let UserIDInt = parseInt(UserID);
 
+        const newComment = {
+            threadID: threadID,
+            content: content,
+            userID: UserIDInt
+        }
+        try {
+            const response = await fetch('/api/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newComment),
+            });
+            if (response.ok) {
+                console.log("New comment created successfully");
+                document.querySelector('#overlay').remove();
+                displayThreadContent(thread)
+            } else {
+                console.error('Failed to submit comment');
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error submitting comment: ', error)
+        }
+    }
+    
 
     // Function to handle upvote or downvote
     async function handleVote(itemID, action, item) {

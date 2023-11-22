@@ -145,7 +145,7 @@ function loadForumContent() {
 
 function loadUserPage() {
     const header = document.querySelector('header');
-    const nameParagraph = document.createElement('p'); // Create a new <p> element
+    const nameParagraph = document.createElement('a'); // Create a new <p> element
     nameParagraph.id = 'name'; // Set the id attribute
     const username = localStorage.getItem('username');
     nameParagraph.textContent = username.toString();
