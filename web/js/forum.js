@@ -172,7 +172,7 @@ const ForumFeed = (function () {
 
             const data = await response.json();
             console.log(data);
-            displayThreads(data);
+            await displayThreads(data);
         } catch (error) {
             console.error('Error fetching threads:', error);
             // Handle the error - you might want to show an error message on the page
@@ -206,39 +206,54 @@ const ForumFeed = (function () {
         })
     }
 
-    function displayThreads(threads) {
+    async function displayThreads(threads) {
         const threadsDiv = document.getElementById('threads');
 
-        threads.forEach(thread => {
-            // Creating a custom div for each thread
+        for (const thread of threads) {
             const threadElement = document.createElement('div');
-            threadElement.classList.add('thread'); // Add class for styling
+            threadElement.classList.add('thread');
 
-            // Title
             const titleElement = document.createElement('h3');
             titleElement.textContent = thread.title;
             threadElement.appendChild(titleElement);
 
-            // Content
             const contentElement = document.createElement('p');
             contentElement.textContent = thread.content;
             threadElement.appendChild(contentElement);
-            // Additional data attributes if needed
-            threadElement.setAttribute('id', thread.threadID);
-            // Add other data attributes as required
 
-            // Append the custom thread element to the threads container
+            // Fetch votes for each thread
+            const threadvotes = await fetchVotes(thread.threadID)
+            /// Thread upvote Button
+            const threadupvoteButton = document.createElement('button');
+            threadupvoteButton.innerHTML = '<span>&uarr;</span> <span class="upvote-count">' + threadvotes.upvotes + '</span>';
+            threadupvoteButton.classList.add('thread-upvote-button');
+            threadupvoteButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const updatedvotes = await handleVote(thread.threadID, 'upvote', "thread");
+                threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+                threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
+            });
+            // Thread downvote Button
+            const threaddownvoteButton = document.createElement('button');
+            threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadvotes.downvotes + '</span>';
+            threaddownvoteButton.classList.add('thread-downvote-button');
+            threaddownvoteButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const updatedvotes = await handleVote(thread.threadID, 'downvote', "thread");
+                threadupvoteButton.querySelector('.upvote-count').textContent = updatedvotes.upvotes;
+                threaddownvoteButton.querySelector('.downvote-count').textContent = updatedvotes.downvotes;
+            });
+
+            // Append elements to the thread container
+            threadElement.appendChild(threadupvoteButton);
+            threadElement.appendChild(threaddownvoteButton);
             threadsDiv.appendChild(threadElement);
 
             // Add event listener for when a thread is clicked
             threadElement.addEventListener('click', async () => {
-                // Your logic for handling the click event on a thread
-                // For example, displaying the full content or opening the thread
-                // console.log('Thread ID:', thread.threadID);
-                // console.log('Full Content:', thread.content);
                 await displayThreadContent(thread);
             });
-        });
+        }
     }
 
     async function displayThreadContent(thread) {
@@ -267,10 +282,10 @@ const ForumFeed = (function () {
         contentElement.textContent = thread.content;
         threadContentModal.appendChild(contentElement);
 
-        const threadupvotes = await fetchVotes(thread.threadID)
+        const threadvotes = await fetchVotes(thread.threadID)
         /// Thread upvote Button
         const threadupvoteButton = document.createElement('button');
-        threadupvoteButton.innerHTML = '<span>&uarr;</span> <span class="upvote-count">' + threadupvotes.upvotes + '</span>';
+        threadupvoteButton.innerHTML = '<span>&uarr;</span> <span class="upvote-count">' + threadvotes.upvotes + '</span>';
         threadupvoteButton.classList.add('upvote-button');
         threadupvoteButton.addEventListener('click', async () => {
             const updatedvotes = await handleVote(thread.threadID, 'upvote', "thread");
@@ -280,7 +295,7 @@ const ForumFeed = (function () {
         threadContentModal.appendChild(threadupvoteButton);
         // Thread downvote Button
         const threaddownvoteButton = document.createElement('button');
-        threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadupvotes.downvotes + '</span>';
+        threaddownvoteButton.innerHTML = '<span>&darr;</span> <span class="downvote-count">' + threadvotes.downvotes + '</span>';
         threaddownvoteButton.classList.add('downvote-button');
         threaddownvoteButton.addEventListener('click', async () => {
             const updatedvotes = await handleVote(thread.threadID, 'downvote', "thread");
