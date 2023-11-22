@@ -10,26 +10,26 @@ type Category struct {
 }
 
 type Thread struct {
-	ThreadID   int       `json:"threadID"`
-	Title      string    `json:"title"`
-	Content    string    `json:"content"`
-	CreatedAt  time.Time `json:"createdAt"`
-	CategoryID int       `json:"categoryID"`
-	UserID     int       `json:"userID"`
-	Username   string    `json:"username"`
-	Upvotes    int       `json:"upvotes"`
-	Downvotes  int       `json:"downvotes"`
+	ThreadID   int    `json:"threadID"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
+	CreatedAt  string `json:"createdAt"`
+	CategoryID int    `json:"categoryID"`
+	UserID     int    `json:"userID"`
+	Username   string `json:"username"`
+	Upvotes    int    `json:"upvotes"`
+	Downvotes  int    `json:"downvotes"`
 }
 
 type Comment struct {
-	CommentID int       `json:"commentID"`
-	UserID    int       `json:"userID"`
-	Username  string    `json:"username"`
-	ThreadID  int       `json:"threadID"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"createdAt"`
-	Upvotes   int       `json:"upvotes"`
-	Downvotes int       `json:"downvotes"`
+	CommentID int    `json:"commentID"`
+	UserID    int    `json:"userID"`
+	Username  string `json:"username"`
+	ThreadID  int    `json:"threadID"`
+	Content   string `json:"content"`
+	CreatedAt string `json:"createdAt"`
+	Upvotes   int    `json:"upvotes"`
+	Downvotes int    `json:"downvotes"`
 }
 
 type Vote struct {

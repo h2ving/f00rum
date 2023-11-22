@@ -785,12 +785,12 @@ header {
     position: absolute;
     cursor: pointer;
     bottom: 10px;
-    right: 10px;
+    right: -9px;
     top: auto;
 }
 
 .thread-main-element > .upvote-button {
-    right: 93px; /* Adjust this value for desired positioning */
+    right: 58px; /* Adjust this value for desired positioning */
 }
 
 

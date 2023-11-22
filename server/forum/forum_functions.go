@@ -28,7 +28,7 @@ func GetCategories() ([]Category, error) {
 }
 
 func GetThreadsByCategoryID(categoryID string) ([]Thread, error) {
-	query := "SELECT * FROM Threads WHERE CategoryID = ?"
+	query := "SELECT threadID, title, content, strftime('%Y-%m-%d %H:%M', createdAt, '+3 hours') AS formattedCreatedAt, categoryID, userID FROM Threads WHERE CategoryID = ?"
 	rows, err := db.Dbase.Query(query, categoryID)
 	if err != nil {
 		fmt.Println("Error querying threads: ", err)
@@ -72,7 +72,7 @@ func CreateThread(title, content string, categoryID, userID int) (int64, error) 
 }
 
 func GetComments(threadID int) ([]Comment, error) {
-	query := `SELECT * FROM Comments WHERE threadID = ?`
+	query := `SELECT commentID, userID, threadID, content, strftime('%Y-%m-%d %H:%M', createdAt, '+3 hours') AS formattedCreatedAt FROM Comments WHERE threadID = ?`
 	result, err := db.Dbase.Query(query, threadID)
 	if err != nil {
 		fmt.Println("Error querying comments for threadID: ", threadID)
@@ -99,24 +99,24 @@ func GetComments(threadID int) ([]Comment, error) {
 
 func CreateComment(threadID, userID int, content string) (int64, error) {
 	// Prepare the SQL statement
-    query := `
+	query := `
         INSERT INTO Comments (threadID, userID, content)
         VALUES (?, ?, ?)
     `
 
-    // Execute the SQL statement
-    result, err := db.Dbase.Exec(query, threadID, userID, content)
-    if err != nil {
-        return 0, err
-    }
+	// Execute the SQL statement
+	result, err := db.Dbase.Exec(query, threadID, userID, content)
+	if err != nil {
+		return 0, err
+	}
 
-    // Retrieve the last inserted ID (commentID)
-    lastInsertID, err := result.LastInsertId()
-    if err != nil {
-        return 0, err
-    }
+	// Retrieve the last inserted ID (commentID)
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
 
-    return lastInsertID, nil
+	return lastInsertID, nil
 }
 
 // Item is either thread or comment

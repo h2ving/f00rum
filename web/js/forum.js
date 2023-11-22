@@ -217,6 +217,18 @@ const ForumFeed = (function () {
             titleElement.textContent = thread.title;
             threadElement.appendChild(titleElement);
 
+            // Author
+            const threadAuthor = document.createElement('p');
+            threadAuthor.textContent = thread.username;
+            threadAuthor.style.color = '#009882';
+            threadElement.appendChild(threadAuthor);
+
+            // Created At / DATE
+            const threadCreatedAt = document.createElement('small');
+            threadCreatedAt.textContent = thread.createdAt;
+            threadCreatedAt.style.color = '#009888';
+            threadElement.appendChild(threadCreatedAt);
+
             const contentElement = document.createElement('p');
             contentElement.textContent = thread.content;
             threadElement.appendChild(contentElement);
