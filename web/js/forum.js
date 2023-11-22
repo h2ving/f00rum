@@ -10,7 +10,7 @@ const ForumFeed = (function () {
             <div id="categories">
                 <!-- Dynamically populated list of categories will appear here -->
             </div>
-            <button id="create-thread-button" disabled>Create New Thread</button>
+            <button id="create-thread-button">Create New Thread</button>
             <div id="threads">
                 <!-- Dynamically populated list of threads will appear here -->
             </div>
@@ -52,11 +52,8 @@ const ForumFeed = (function () {
         categoriesDiv.addEventListener('click', (event) => {
             if (event.target.tagName === 'DIV') {
                 const categoryID = event.target.dataset.categoryID;
-                //console.log("Now fetching threads with categoryID: ", categoryID)
-                createThreadButton.removeAttribute('disabled');
                 stateCategorySelector = true;
                 fetchThreads(categoryID)
-
             }
         });
         createThreadButton.addEventListener("click", () => {
@@ -150,6 +147,7 @@ const ForumFeed = (function () {
             })
             .catch(error => {
                 console.error('Error fetching categories:', error);
+                console.log('Error response:', error.response);
             });
 
     }
@@ -232,8 +230,8 @@ const ForumFeed = (function () {
             threadElement.addEventListener('click', async () => {
                 // Your logic for handling the click event on a thread
                 // For example, displaying the full content or opening the thread
-                console.log('Thread ID:', thread.threadID);
-                console.log('Full Content:', thread.content);
+                // console.log('Thread ID:', thread.threadID);
+                // console.log('Full Content:', thread.content);
                 await displayThreadContent(thread);
             });
         });
@@ -364,7 +362,6 @@ const ForumFeed = (function () {
         }
     }
 
-    // DEPRECATED
     async function fetchVotes(threadID) {
         try {
             const response = await fetch(`/api/votes?threadID=${threadID}`);

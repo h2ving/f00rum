@@ -8,8 +8,7 @@ body {
     padding: 0;
 }
 
-/*
-.container {
+.loginContainer {
     background-color: #0a1f1f;
     max-width: 800px;
     margin: 50px auto;
@@ -18,7 +17,6 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-*/
 
 .container h2 {
     color: #009882;
@@ -588,8 +586,7 @@ header {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 80%;
-    /* Adjust the width as needed */
+    max-width: 80%; /* Adjust the width as needed */
     margin: 0 auto;
     position: relative;
     /* To make sure the Close button is positioned correctly */
@@ -748,28 +745,4 @@ header {
     color: #009882;
     /* Username color */
     margin-bottom: 15px;
-}
-
-/* Styling for upvoted threads and comments can be added here */
-
-/* Styling for upvote/downvote buttons if needed */
-.upvote-button,
-.downvote-button {
-    /* Your button styles here */
-    /* Example styles */
-    background-color: #3498db;
-    /* Default color */
-    color: #fff;
-    /* Text color */
-    padding: 8px 15px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.upvote-button:hover,
-.downvote-button:hover {
-    background-color: #2980b9;
-    /* Hover color */
 }

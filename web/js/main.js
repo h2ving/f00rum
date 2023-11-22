@@ -25,9 +25,7 @@ document.body.addEventListener('submit', async function (event) {
 
             // Handle server's response
             if (response.ok) {
-
                 localStorage.setItem('username', data.username);
-                //clearLocalStorage();
                 //alert(result.message); // Show success message
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
                 // Redirect the user to the forum page
@@ -65,7 +63,6 @@ document.body.addEventListener('submit', async function (event) {
             // Handle server's response
             if (response.ok) {
                 localStorage.setItem('username', data.username);
-                //clearLocalStorage();
                 // You can redirect the user to the forum page
                 history.pushState({ page: 'forum' }, 'Forum', '/forum');
                 router(history.state);
@@ -94,9 +91,10 @@ document.body.addEventListener('click', async function (event) {
 
             // Handle server's response
             if (response.ok) {
-                localStorage.clear();
+                //localStorage.clear();
                 // Redirect the user to the login page
                 history.pushState({ page: 'login' }, 'Login', '/login');
+                location.reload();
                 router(history.state);
             } else {
                 alert(result.error); // Show error message
@@ -122,8 +120,10 @@ window.addEventListener('popstate', function (event) {
 // Load the forum content
 function loadForumContent() {
     const header = document.querySelector('header');
-
     const nameAnchor = document.createElement('a'); // Create a new <a> element
+    const loginForm = document.querySelector('.loginContainer');
+    loginForm.style.display = 'none';
+
     nameAnchor.id = 'userPageButton'; // Set the id attribute
     nameAnchor.className = 'userpage-button'
 
@@ -133,11 +133,12 @@ function loadForumContent() {
     nameAnchor.href = '/userpage'; // Set the href attribute for navigation
 
     const loggedIn = `
-            <a href="#" id="buttonHome" class="button-home">Real-Time Forum</a>
+            <a href="#" id="buttonHome" class="button-home">F00RUM</a>
             <button id="logout" type="button">Log out</button>
     `;
     header.innerHTML = loggedIn;
     header.insertBefore(nameAnchor, header.querySelector('#logout'));
+    // init feed and chat modules
     ForumFeed.init()
     ChatBox.init()
 }
@@ -149,7 +150,7 @@ function loadUserPage() {
     const username = localStorage.getItem('username');
     nameParagraph.textContent = username.toString();
     const loggedIn = `
-            <a href="#" id="buttonHome" class="button-home">Real-Time Forum</a>
+            <a href="#" id="buttonHome" class="button-home">F00RUM</a>
             <button id="logout" type="button">Log out</button>
     `;
     header.innerHTML = loggedIn;
@@ -160,11 +161,12 @@ function loadUserPage() {
 // Load the login page with a registration option
 function loadLoginPage() {
     const header = document.querySelector('header');
-    const container = document.querySelector('.container');
+    const container = document.querySelector('.loginContainer');
+    container.style.display = 'block';
 
     // Set the header with the login form
     const login = `
-            <a href="/" class="button-home">Real-Time Forum</a>
+            <a href="/" class="button-home">F00RUM</a>
             <form id="loginForm">
                 <input type="text" name="username" placeholder="Username or Email" required>
                 <input type="password" name="password" placeholder="Password" required>
@@ -192,7 +194,6 @@ function loadLoginPage() {
     `;
     header.innerHTML = login;
     container.innerHTML = register;
-
 }
 
 function router(state) {
