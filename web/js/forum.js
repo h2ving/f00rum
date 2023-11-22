@@ -277,6 +277,12 @@ const ForumFeed = (function () {
         threadAuthor.style.color = '#009882';
         originalThreadContent.appendChild(threadAuthor);
 
+        // Created At / DATE
+        const threadCreatedAt = document.createElement('span');
+        threadCreatedAt.textContent = thread.createdAt;
+        threadCreatedAt.style.color = '#009888';
+        originalThreadContent.appendChild(threadCreatedAt);
+
         // Content
         const contentElement = document.createElement('p');
         contentElement.textContent = thread.content;
@@ -325,6 +331,13 @@ const ForumFeed = (function () {
                 commentAuthor.textContent = comment.username;
                 commentAuthor.style.color = '#009882';
                 commentListItem.appendChild(commentAuthor);
+
+                //DATE
+                const commentDate = document.createElement('span');
+                commentDate.textContent = comment.createdAt;
+                commentDate.style.color = '#002121';
+                commentListItem.appendChild(commentDate);
+
 
                 /// Comment upvote Button
                 const upvoteButton = document.createElement('button');
