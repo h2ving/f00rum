@@ -31,11 +31,3 @@ type Comment struct {
 	Upvotes   int    `json:"upvotes"`
 	Downvotes int    `json:"downvotes"`
 }
-
-type Vote struct {
-	VoteID    int    `json:"voteID"`
-	Type      string `json:"type"` // 'like' or 'dislike'
-	UserID    int    `json:"userID"`
-	ThreadID  int    `json:"threadID"`
-	CommentID int    `json:"commentID"`
-}

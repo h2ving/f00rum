@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"real-time-forum/server"
+	"real-time-forum/server/forum"
 	"strconv"
 )
 
@@ -118,7 +119,7 @@ func (c *Client) writePump() {
 
 // ServeWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	log.Println(server.UserID, " connected")
+	log.Println(forum.GetUserByID(server.UserID), " connected")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)

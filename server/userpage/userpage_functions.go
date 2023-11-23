@@ -3,14 +3,15 @@ package userpage
 import (
 	"fmt"
 	"real-time-forum/db"
+	"real-time-forum/server/forum"
 )
 
-func GetThreadsByUsername(username string) ([]Thread, error) {
-	var threads []Thread
+func GetThreadsByUsername(username string) ([]forum.Thread, error) {
+	var threads []forum.Thread
 
 	// Fetch threads based on the provided username
 	query := `
-		SELECT t.threadID, t.title, t.content, t.categoryID, t.userID
+		SELECT t.threadID, t.title,  strftime('%Y-%m-%d %H:%M', t.createdAt, '+3 hours') AS formattedCreatedAt,t.content, t.categoryID, t.userID
 		FROM Threads t
 		JOIN Users u ON t.userID = u.userID
 		WHERE u.username = ?
@@ -18,14 +19,14 @@ func GetThreadsByUsername(username string) ([]Thread, error) {
 
 	rows, err := db.Dbase.Query(query, username)
 	if err != nil {
-		fmt.Println("Error querying threads by username: ", username + " with error: ", err)
+		fmt.Println("Error querying threads by username: ", username+" with error: ", err)
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var thread Thread
-		if err := rows.Scan(&thread.ThreadID, &thread.Title, &thread.Content, &thread.CategoryID, &thread.UserID); err != nil {
+		var thread forum.Thread
+		if err := rows.Scan(&thread.ThreadID, &thread.Title, &thread.CreatedAt, &thread.Content, &thread.CategoryID, &thread.UserID); err != nil {
 			return nil, err
 		}
 		threads = append(threads, thread)
@@ -37,14 +38,13 @@ func GetThreadsByUsername(username string) ([]Thread, error) {
 	return threads, nil
 }
 
-
 // GetUserUpvotedThreads retrieves threads upvoted by a specific user
-func GetUserUpvotedThreads(username string) ([]Thread, error) {
-	var upvotedThreads []Thread
+func GetUserUpvotedThreads(username string) ([]forum.Thread, error) {
+	var upvotedThreads []forum.Thread
 
 	// Fetch upvoted threads based on the provided username
 	query := `
-		SELECT t.threadID, t.title, t.content, t.categoryID, t.userID
+		SELECT t.threadID, t.title,  strftime('%Y-%m-%d %H:%M', t.createdAt, '+3 hours') AS formattedCreatedAt, t.content, t.categoryID, t.userID
 		FROM Threads t
 		INNER JOIN Votes v ON t.threadID = v.threadID
 		INNER JOIN Users u ON v.userID = u.userID
@@ -58,8 +58,8 @@ func GetUserUpvotedThreads(username string) ([]Thread, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var thread Thread
-		if err := rows.Scan(&thread.ThreadID, &thread.Title, &thread.Content, &thread.CategoryID, &thread.UserID); err != nil {
+		var thread forum.Thread
+		if err := rows.Scan(&thread.ThreadID, &thread.Title, &thread.CreatedAt, &thread.Content, &thread.CategoryID, &thread.UserID); err != nil {
 			return nil, err
 		}
 		upvotedThreads = append(upvotedThreads, thread)
@@ -71,4 +71,3 @@ func GetUserUpvotedThreads(username string) ([]Thread, error) {
 
 	return upvotedThreads, nil
 }
-

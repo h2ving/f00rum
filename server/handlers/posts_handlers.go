@@ -29,7 +29,6 @@ func GetThreadsByCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	categoryID := r.URL.Query().Get("categoryID")
 	threads, err := forum.GetThreadsByCategoryID(categoryID)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Failed to get threads from server: ", http.StatusInternalServerError)
 		return
 	}
@@ -98,9 +97,9 @@ func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var request struct {
-		ThreadID int `json:"threadID"`
-		Content string `json:"content"`
-		UserID int `json:"userID"`
+		ThreadID int    `json:"threadID"`
+		Content  string `json:"content"`
+		UserID   int    `json:"userID"`
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -114,10 +113,10 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create comment", http.StatusInternalServerError)
 		return
 	}
-	
+
 	response := map[string]interface{}{
 		"message": "Comment created successfully",
-		"data": commentID,
+		"data":    commentID,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)

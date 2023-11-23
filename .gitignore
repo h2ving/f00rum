@@ -1,4 +1,5 @@
 /vendor
 .vscode
+.idea
 /db/mockup.sql
 forum.session.sql

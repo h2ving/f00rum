@@ -102,7 +102,6 @@ const ForumFeed = (function () {
             categoryID: categoryID,
             userID: UserIDInt,
         };
-        console.log(newThread)
 
         try {
             const response = await fetch('/api/threads', {
@@ -138,7 +137,6 @@ const ForumFeed = (function () {
                 return response.json();
             })
             .then(data => {
-                console.log('Received categories data: ', data);
                 displayCategories(data);
 
                 const modalCategorySelect = document.getElementById('modalCategory');
@@ -171,8 +169,7 @@ const ForumFeed = (function () {
             }
 
             const data = await response.json();
-            console.log(data);
-            await displayThreads(data);
+            await displayThreads(data, 'threads');
         } catch (error) {
             console.error('Error fetching threads:', error);
             // Handle the error - you might want to show an error message on the page
@@ -206,8 +203,8 @@ const ForumFeed = (function () {
         })
     }
 
-    async function displayThreads(threads) {
-        const threadsDiv = document.getElementById('threads');
+    async function displayThreads(threads, element) {
+        const threadsDiv = document.getElementById(element);
 
         for (const thread of threads) {
             const threadElement = document.createElement('div');
@@ -504,6 +501,7 @@ const ForumFeed = (function () {
     //Public methods
     return {
         init: init,
+        displayThreads: displayThreads,
     };
 })();
 

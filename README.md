@@ -122,13 +122,15 @@ This Real-Time Forum Application is designed to facilitate user interactions, in
 ### Instructions
 
 1. **Setup**: Clone the repository and host the application on a web server.
-2. **Execution**: Open the application in a web browser.
-3. **Usage**: Interact with the forms, forum feed, chat functionalities, and user-specific pages as per the application flow.
+2. **Execution**: go run . and open localhost:8080 on browser.
+3. **Usage**: You can create your own account or use test accounts: Anna (password: anna) and Jake (password: jake)
+   
 
 ## Contributors
 
 - h2ving
 - ecce75
+- AndreiTuhkru
 
 ## Future Improvements
 
