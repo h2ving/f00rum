@@ -1,10 +1,10 @@
-# F00RUM
+# F00RUM 🌐
 
-## Overview
+## Overview 👀
 
 This Real-Time Forum Application is designed to facilitate user interactions, including registration, login, forum feed viewing, chat functionalities, and user-specific pages.
 
-## Features
+## Features 🌟
 
 ### User Authentication
 
@@ -26,7 +26,7 @@ This Real-Time Forum Application is designed to facilitate user interactions, in
 - **Profile Display**: Shows user-specific information and activities.
 - **Navigation**: Allows users to navigate across different sections of the application.
 
-## Code Structure
+## Code Structure 🛠️
 
 ### File Structure
 
@@ -111,7 +111,7 @@ This Real-Time Forum Application is designed to facilitate user interactions, in
 - **UserPage Module**: Manages user-specific page functionalities.
 - **Profile Display**: Handles the display of user information and activities.
 
-## Usage
+## Usage 🔧
 
 ### Dependencies
 
@@ -126,13 +126,13 @@ This Real-Time Forum Application is designed to facilitate user interactions, in
 3. **Usage**: You can create your own account or use test accounts: Anna (password: anna) and Jake (password: jake)
    
 
-## Contributors
+## Contributors 🤝
 
 - h2ving
 - ecce75
 - AndreiTuhkru
 
-## Future Improvements
+## Future Improvements 🤹
 
 - Enhance UI/UX for a more intuitive experience.
 - Implement more robust error handling for form submissions and API requests.
